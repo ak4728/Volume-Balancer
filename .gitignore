@@ -1,0 +1,13 @@
+# Raw licensed exports stay out of the repo (INRIX, StreetLight, Replica)
+Santa-Fe-Model---I25---Travel-Times---5-minutes.csv
+TMC_Identification.csv
+Contents.txt
+Streetlight TMC */
+replica-*/
+# Other project's page and build caches
+inrix_tt_map.html
+tools/cache/
+# OS / editor noise
+Thumbs.db
+.DS_Store
+*.tmp

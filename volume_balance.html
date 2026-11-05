@@ -1,0 +1,1147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Volume Balance</title>
+<meta name="description" content="Editable network volume-balance diagram: counts, StreetLight turning movements and user overrides reconciled by conservation of flow, saved to network.json.">
+<style>
+:root{--bg:#f4f4f1;--surface:#ffffff;--surface2:#ecece8;--border:#d6d5cf;--text:#1e1e1c;--text2:#5d5c58;--muted:#8b8a85;
+ --accent:#2a6fd6;--int:#013082;--street:#028553;--ramp:#2f9a6e;--stl:#f1c84b;--tcds:#1378a9;--ok:#1f8a4c;--warn:#d38b12;--bad:#c7303c;--lock:#222;
+ --shadow:0 4px 18px rgba(0,0,0,.14)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161615;--surface:#1f1f1e;--surface2:#2a2a28;--border:#3b3b38;--text:#ececea;--text2:#b3b2ad;--muted:#85847f;
+ --accent:#6ea8f0;--int:#8db0ff;--street:#4fcf8f;--ramp:#5fc9a0;--stl:#e2bd4a;--tcds:#5fb3dd;--ok:#4ec47f;--warn:#e8a93a;--bad:#f06a74;--lock:#eee;--shadow:0 4px 18px rgba(0,0,0,.5)}}
+:root[data-theme="dark"]{--bg:#161615;--surface:#1f1f1e;--surface2:#2a2a28;--border:#3b3b38;--text:#ececea;--text2:#b3b2ad;--muted:#85847f;
+ --accent:#6ea8f0;--int:#8db0ff;--street:#4fcf8f;--ramp:#5fc9a0;--stl:#e2bd4a;--tcds:#5fb3dd;--ok:#4ec47f;--warn:#e8a93a;--bad:#f06a74;--lock:#eee;--shadow:0 4px 18px rgba(0,0,0,.5)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font:13px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--text);background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+header{flex:0 0 44px;display:flex;align-items:center;gap:12px;padding:0 14px;border-bottom:1px solid var(--border);background:var(--surface)}
+header h1{margin:0;font-size:15px;font-weight:650;white-space:nowrap}
+header .file{color:var(--text2);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px}
+header .spacer{flex:1}
+.tb{flex:0 0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:6px 14px;border-bottom:1px solid var(--border);background:var(--surface2)}
+.tb .sep{width:1px;height:22px;background:var(--border);margin:0 4px}
+button,select,input[type=text],input[type=number],input[type=date],textarea{font:inherit;font-size:12px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px}
+button{cursor:pointer}button:hover{border-color:var(--text2)}button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+button.small{padding:2px 6px;font-size:11px}
+label.ck{display:inline-flex;align-items:center;gap:4px;color:var(--text2);font-size:12px}
+#main{flex:1 1 auto;display:flex;min-height:0}
+#wrap{flex:1 1 auto;position:relative;min-width:0;background:var(--bg)}
+#canvas{position:absolute;inset:0;width:100%;height:100%;cursor:grab;touch-action:none}
+#canvas.tool{cursor:crosshair}
+#status{position:absolute;left:10px;bottom:10px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--text2);pointer-events:none}
+#legend{position:absolute;right:10px;bottom:10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--text2);display:grid;grid-template-columns:auto auto;gap:3px 8px;align-items:center}
+#legend i{display:inline-block;width:26px;height:0;border-top:4px solid}
+#legend .sw{display:inline-block;width:14px;height:12px;border-radius:3px;border:1px solid var(--border)}
+aside{flex:0 0 370px;border-left:1px solid var(--border);background:var(--surface);overflow:auto;padding:12px 14px}
+aside h2{font-size:14px;margin:0 0 8px}aside h3{font-size:12px;margin:14px 0 6px;color:var(--text2);text-transform:uppercase;letter-spacing:.04em}
+aside .row{display:flex;gap:6px;align-items:center;margin:4px 0;flex-wrap:wrap}
+aside .row label{min-width:86px;color:var(--text2);font-size:12px}
+aside input[type=text],aside input[type=number],aside select,aside textarea{flex:1 1 auto;min-width:0}
+aside input[type=number]{width:90px;flex:0 0 auto}
+aside table{border-collapse:collapse;width:100%;font-size:12px}
+aside td,aside th{padding:3px 4px;border-bottom:1px solid var(--border);text-align:left}
+aside th{color:var(--text2);font-weight:500}
+aside td input[type=number]{width:70px;padding:2px 4px}
+aside .ov input{border-color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,var(--surface))}
+.chipl{display:flex;flex-direction:column;gap:3px}
+.chip{display:inline-flex;gap:6px;align-items:center;font-size:11.5px;padding:2px 6px;border-radius:5px;border:1px solid var(--border);background:var(--surface2)}
+.chip b{font-variant-numeric:tabular-nums}
+.d-ok{color:var(--ok)}.d-warn{color:var(--warn)}.d-bad{color:var(--bad)}
+.muted{color:var(--muted);font-size:11.5px}
+.danger{color:var(--bad);border-color:var(--bad)}
+#banner{position:absolute;top:8px;left:50%;transform:translateX(-50%);background:var(--surface);border:1px solid var(--warn);border-radius:8px;padding:6px 10px;box-shadow:var(--shadow);display:none;gap:8px;align-items:center;z-index:5;font-size:12px}
+dialog{border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);box-shadow:var(--shadow);max-width:560px;width:92vw}
+dialog::backdrop{background:rgba(0,0,0,.35)}
+dialog h2{margin:0 0 10px;font-size:15px}
+dialog .row{display:flex;gap:8px;align-items:center;margin:6px 0}dialog .row label{min-width:150px;color:var(--text2)}
+dialog .foot{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+kbd{font:11px ui-monospace,monospace;border:1px solid var(--border);border-radius:4px;padding:0 4px;background:var(--surface2)}
+/* svg */
+svg text{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;user-select:none}
+.lk{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.lk.interstate{stroke:var(--int);stroke-width:5}.lk.street{stroke:var(--street);stroke-width:3}.lk.ramp{stroke:var(--ramp);stroke-width:2}
+.lk.hit{stroke:transparent;stroke-width:14;cursor:pointer}
+.lk.sel{stroke:var(--accent)!important;stroke-width:7!important;opacity:.55}
+.lbl rect.main{fill:var(--surface);stroke:var(--border)}
+.lbl.lock rect.main{stroke:var(--lock);stroke-width:1.6}.lbl.derived rect.main{stroke-dasharray:3 2}.lbl.unknown rect.main{stroke:var(--bad)}
+.lbl text.v{font-size:13px;font-weight:650;fill:var(--text)}.lbl.derived text.v{font-style:italic}.lbl.unknown text.v{fill:var(--bad)}
+.lbl text.name{font-size:9.5px;fill:var(--text2)}
+.chipg rect{fill:var(--surface2);stroke:var(--border)}.chipg text{font-size:9px;fill:var(--text2)}
+.chipg.ok rect{stroke:var(--ok)}.chipg.warn rect{stroke:var(--warn)}.chipg.bad rect{stroke:var(--bad)}
+.chipg.ok text.d{fill:var(--ok)}.chipg.warn text.d{fill:var(--warn)}.chipg.bad text.d{fill:var(--bad)}
+.chipg.obs rect{fill:color-mix(in srgb,var(--tcds) 18%,var(--surface))}.chipg.tmc rect{fill:color-mix(in srgb,var(--stl) 35%,var(--surface))}
+.nd{cursor:pointer}
+.nd.junction circle,.nd.junction ellipse{fill:var(--surface);stroke:var(--text2);stroke-width:2}
+.nd.terminal rect{fill:var(--surface2);stroke:var(--text2);stroke-width:1.5}
+.nd.sel>circle,.nd.sel>ellipse,.nd.sel rect.box,.nd.sel rect.term{stroke:var(--accent)!important;stroke-width:3!important}
+.nd text.nl{font-size:10.5px;fill:var(--text2)}
+.nd.tmc rect.box{fill:color-mix(in srgb,var(--stl) 22%,var(--surface));stroke:var(--text2);stroke-width:1.5;rx:6}
+.nd.tmc text.title{font-size:11px;font-weight:650;fill:var(--text)}
+.nd.tmc .mvcell{cursor:text}
+.nd.tmc .mvcell text.glyph{font-size:10.5px;fill:var(--text2)}
+.nd.tmc .mvcell rect.mvbox{fill:var(--surface);stroke:var(--border);stroke-width:1}
+.nd.tmc .mvcell:hover rect.mvbox{stroke:var(--accent);stroke-width:1.6}
+.nd.tmc .mvcell text.mv{font-size:10.5px;fill:var(--text);font-variant-numeric:tabular-nums}
+.nd.tmc .mvcell.ov rect.mvbox{stroke:var(--warn);stroke-width:1.6;fill:color-mix(in srgb,var(--warn) 14%,var(--surface))}
+.nd.tmc .mvcell.ov text.mv{fill:var(--warn);font-weight:650}
+.nd.tmc .mvcell.extra rect.mvbox{stroke:var(--accent)}
+.nd.tmc .mvcell.extra text.mv{fill:var(--accent)}
+.nd.tmc text.sum{font-size:9px;fill:var(--text2)}
+.nd.tmc text.src{font-size:8.5px;fill:var(--muted)}
+.port circle{fill:var(--surface);stroke:var(--muted);stroke-width:1.4;stroke-dasharray:3 2}
+.port.used circle{stroke-dasharray:none;stroke:var(--street);stroke-width:2.5}
+.port.in.used circle{fill:var(--street)}
+.port .tri{fill:var(--muted)}.port.used .tri{fill:var(--street)}.port.in.used .tri{fill:#fff}
+#canvas.tool .port.free{cursor:crosshair}#canvas.tool .port.free:hover circle{stroke:var(--accent);stroke-width:3;stroke-dasharray:none}
+#canvas.connecting .port.free circle{stroke:var(--accent);stroke-dasharray:none}
+#canvas.connecting .port.free.in circle{fill:color-mix(in srgb,var(--accent) 18%,var(--surface))}
+.imb rect{fill:var(--bad);stroke:none}.imb text{font-size:9.5px;fill:#fff;font-weight:600}
+.imb.warn rect{fill:var(--warn)}
+.ghost{stroke:var(--accent);stroke-width:2;stroke-dasharray:5 4;fill:none}
+</style>
+</head>
+<body>
+<header>
+  <h1>Volume Balance</h1>
+  <span class="file" id="fileName">embedded default</span>
+  <span class="spacer"></span>
+  <label class="ck">Scenario <select id="scSel"></select></label>
+  <button id="btnScen" title="Manage scenarios">Scenarios…</button>
+  <button id="btnSettings">Settings…</button>
+  <button id="btnHelp">Help</button>
+  <button id="btnMap" title="Open the corridor map (INRIX, StreetLight, Replica) in a new tab" onclick="window.open('corridor_map.html','_blank')">Corridor map ↗</button>
+</header>
+<div class="tb">
+  <button id="btnNew" title="Start an empty network from scratch">New</button>
+  <button id="btnOpen" title="Open a network.json">Open JSON…</button>
+  <button id="btnReconnect" hidden title="Reconnect the JSON file used last time">Reconnect file</button>
+  <button id="btnSave" title="Save to the opened file (Ctrl+S)">Save</button>
+  <button id="btnSaveAs">Save as…</button>
+  <span class="sep"></span>
+  <button id="btnImportStl" title="Import a StreetLight *_tmc_full_table.csv">Import StreetLight CSV…</button>
+  <select id="expSel"><option value="">Export…</option><option value="links">Links CSV</option><option value="mov">Movements CSV</option><option value="svg">Diagram SVG</option><option value="png">Diagram PNG</option></select>
+  <span class="sep"></span>
+  <button class="tool on" data-tool="select">Select</button>
+  <button class="tool" data-tool="add-junction">+ Junction</button>
+  <button class="tool" data-tool="add-terminal">+ Terminal</button>
+  <button class="tool" data-tool="add-tmc">+ Intersection</button>
+  <button class="tool" data-tool="connect">Connect</button>
+  <span class="sep"></span>
+  <button id="btnUndo" title="Ctrl+Z">Undo</button>
+  <button id="btnFit">Fit</button>
+  <label class="ck"><input type="checkbox" id="ckChips" checked> chips</label>
+  <label class="ck"><input type="checkbox" id="ckNames" checked> names</label>
+  <input type="file" id="fileJson" accept=".json,application/json" hidden>
+  <input type="file" id="fileCsv" accept=".csv,text/csv" hidden>
+</div>
+<div id="main">
+  <div id="wrap">
+    <svg id="canvas" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="arr-interstate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--int)"/></marker>
+        <marker id="arr-street" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--street)"/></marker>
+        <marker id="arr-ramp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--ramp)"/></marker>
+      </defs>
+      <g id="world"><g id="gLinks"></g><g id="gNodes"></g><g id="gLabels"></g><g id="gGhost"></g></g>
+    </svg>
+    <div id="banner"></div>
+    <div id="status"></div>
+    <div id="legend">
+      <i style="border-color:var(--int)"></i><span>Interstate</span>
+      <i style="border-color:var(--street);border-top-width:3px"></i><span>Street</span>
+      <i style="border-color:var(--ramp);border-top-width:2px"></i><span>Ramp</span>
+      <span class="sw" style="background:color-mix(in srgb,var(--tcds) 18%,var(--surface))"></span><span>Count (TCDS…)</span>
+      <span class="sw" style="background:color-mix(in srgb,var(--stl) 35%,var(--surface))"></span><span>StreetLight TMC</span>
+      <span class="sw" style="border:1.6px solid var(--lock)"></span><span>Locked (typed)</span>
+      <span class="sw" style="border:1px dashed var(--text2)"></span><span>Derived by balance</span>
+      <span><span class="sw" style="border-radius:50%;background:var(--street);border-color:var(--street)"></span><span class="sw" style="border-radius:50%;border:2px solid var(--street)"></span><span class="sw" style="border-radius:50%;border:1px dashed var(--muted)"></span></span><span>Ports: in · out · free (click in Connect)</span>
+      <span><b class="d-ok">±5%</b> <b class="d-warn">±10%</b> <b class="d-bad">&gt;10%</b></span><span>difference</span>
+    </div>
+  </div>
+  <aside id="panel"></aside>
+</div>
+<dialog id="dlgSettings"></dialog>
+<dialog id="dlgHelp">
+  <h2>How this page works</h2>
+  <p>Every <b>link</b> carries one balanced volume. Where it comes from, in priority order:</p>
+  <ol>
+    <li><b>Locked</b>: you typed it (border solid black, 🔒).</li>
+    <li><b>Count</b>: the link's primary observed count, grown to the base year (mode <i>Auto</i>).</li>
+    <li><b>Turning movements</b>: approach or departure sum at an adjacent intersection box.</li>
+    <li><b>Balance</b>: solved from conservation of flow at junctions (dashed border, italic).</li>
+  </ol>
+  <p>Chips under a value compare it with each other evidence: counts, StreetLight approach/departure, and the flow implied by the neighbouring junction. Junctions that cannot balance show a red Δ.</p>
+  <p>Intersection boxes list the 12 movements as in the spreadsheet (top row = southbound approach ↙↓↘, bottom = northbound ↖↑↗, left = eastbound, right = westbound). Bind a box to a StreetLight source and the scenario's day type / hour drive it; typed movements override and stay orange.</p>
+  <p><b>Editing</b>: drag nodes; click to edit in the side panel. The + tools stay active so you can place several nodes; <kbd>Esc</kbd> returns to Select. <i>Connect</i>: click a port on an intersection box (triangle pointing in = IN port where a link ends, pointing out = OUT port where a link starts) or a junction / terminal, then the other end; the direction follows the ports, so the click order does not matter. <kbd>Shift</kbd>+click on the second end also creates the opposite direction, and a link's panel has a "Create opposite direction" button. <kbd>Del</kbd> deletes, <kbd>Ctrl+Z</kbd> undoes, wheel zooms, drag empty canvas to pan.</p>
+  <p><b>Typing movements</b>: every movement inside an intersection box is a small entry box; click it and type the new value (Enter saves, Tab saves and moves to the next box, Esc cancels), or use the grid in the box's panel. A typed value on a StreetLight-bound box becomes an orange override; the panel's ↺ returns it to the source.</p>
+  <p><b>Extra movements</b>: an intersection panel can add U-turns, second turn lanes or any custom entry-leg → exit-leg movement the source does not carry. They count toward the approach and departure sums, so the balance sees them.</p>
+  <p><b>Files</b>: the page opens with the embedded network. <i>Open JSON…</i> loads your <code>network.json</code>; <i>Save</i> writes back to that same file (Chrome/Edge) or downloads it. A draft is also kept in this browser.</p>
+  <div class="foot"><button onclick="this.closest('dialog').close()">Close</button></div>
+</dialog>
+<script id="embedded-data" type="application/json">{"meta":{"name":"I-25 / Santa Fe Dr volume balance","description":"Built from AK_Volume Balance.xlsx (Baseline 5PM), CDOT TCDS counts and StreetLight TMC 2098249.","version":1},"settings":{"baseYear":2026,"growthPct":0,"okPct":5,"warnPct":10},"defaultScenario":"baseline_pm","scenarios":{"baseline_pm":{"name":"Baseline (5 PM)","dayType":"0: All Days (M-Su)","start":"1700","bins":4,"links":{"ramp_sb_8th_off":{"observed":[{"source":"TCDS","date":null,"value":457}]},"ramp_sb_8th_on":{"observed":[{"source":"TCDS","date":null,"value":369}]},"ramp_sb_6th_off_wb":{"observed":[{"source":"TCDS","date":"2020-09-30","value":1969}]},"ramp_sb_6th_off_eb":{"observed":[{"source":"TCDS","date":"2020-08-04","value":289}]},"ramp_sb_6th_on_wb":{"observed":[{"source":"TCDS","date":"2020-07-14","value":293}]},"ramp_sb_6th_on_eb":{"observed":[{"source":"TCDS","date":"2020-07-14","value":2274}]},"i25sb_6th_alameda":{"observed":[{"source":"TCDS","date":"2020-08-04","value":8495}],"mode":"lock","balanced":8055,"note":"Spreadsheet AV30: typed 8055 against the 2020 count of 8495 (-5.2%)."},"ramp_sb_alameda_off":{"observed":[{"source":"TCDS","date":"2017-04-25","value":678}]},"ramp_sb_sf_off":{"observed":[{"source":"TCDS","date":"2017-11-02","value":2551}]},"ramp_sb_sf_on":{"observed":[{"source":"TCDS","date":"2017-11-02","value":511}]},"i25sb_sf_bwy":{"observed":[{"source":"TCDS","date":"2017-11-02","value":5588}],"note":"Spreadsheet AR60 shows 2027-11-02; assumed 2017-11-02 like the other interchange counts."},"ramp_sb_bwy_off":{"observed":[{"source":"TCDS","date":"2020-07-16","value":323}]},"ramp_sb_frontage_off":{"observed":[{"source":"TCDS","date":"2022-10-11","value":1343}]},"ramp_sb_frontage_on":{"observed":[{"source":"TCDS","date":"2020-07-16","value":1500}]},"i25sb_arkansas":{"observed":[{"source":"TCDS","date":"2010-10-19","value":7164}],"mode":"derive","note":"Spreadsheet derives this (AV74) and compares with the 2010 count."},"i25nb_arkansas":{"observed":[{"source":"TCDS","date":"2010-10-19","value":4119}]},"ramp_nb_ohio_off":{"observed":[{"source":"TCDS","date":"2020-07-15","value":1377}]},"ramp_nb_wash_on":{"observed":[{"source":"TCDS","date":"2020-07-15","value":1377}]},"ramp_nb_ohio_on":{"observed":[{"source":"TCDS","date":"2020-09-15","value":202}]},"i25nb_ohio_sf":{"observed":[{"source":"TCDS","date":"2017-11-02","value":5040}]},"ramp_nb_sf_off":{"observed":[{"source":"TCDS","date":"2017-11-02","value":1203}]},"ramp_nb_sf_on":{"observed":[{"source":"TCDS","date":"2017-11-02","value":1150}]},"ramp_nb_cedar_on":{"observed":[{"source":"TCDS","date":"2017-04-25","value":334}]},"i25nb_cedar_6th":{"observed":[{"source":"TCDS","date":"2020-08-04","value":7135}]},"ramp_nb_6th_off_wb":{"observed":[{"source":"TCDS","date":"2020-07-14","value":1164}]},"ramp_nb_6th_off_eb":{"observed":[{"source":"TCDS","date":"2020-07-14","value":52}]},"ramp_nb_6th_on_wb":{"observed":[{"source":"TCDS","date":"2020-08-04","value":454}]},"ramp_nb_6th_on_eb":{"observed":[{"source":"TCDS","date":"2020-07-14","value":1569}]},"ramp_nb_8th_off":{"observed":[{"source":"TCDS","date":"2022-07-27","value":155}]},"i25nb_8th_mid":{"observed":[{"source":"TCDS","date":"2022-08-31","value":7018}]},"ramp_nb_8th_on":{"observed":[{"source":"TCDS","date":"2021-11-04","value":652}]},"kal_alameda_i25":{"observed":[{"source":"TCDS","date":"2020-10-20","value":1132}],"mode":"derive","note":"Spreadsheet BS46 derives this from the 2013 Santa Fe SB count and compares with the 2020 count."},"sfsb_i25_miss":{"observed":[{"source":"TCDS","date":"2013-04-23","value":3236}]},"sfnb_miss_i25":{"observed":[{"source":"TCDS","date":"2013-04-23","value":2471}]},"sfnb_i25_alameda":{"observed":[{"source":"TCDS","date":"2020-09-15","value":2656}],"mode":"derive","note":"Spreadsheet BZ46 derives this and compares with the 2020 count."}},"tmc":{"tmc_miss_w":{"source":{"id":"stl_2098249","intersection":"Mississippi West"},"movements":{"NBL":0,"NBT":0,"NBR":0,"SBL":69,"SBT":2231,"SBR":162,"EBL":0,"EBT":344,"EBR":147,"WBL":238,"WBT":416,"WBR":0}},"tmc_miss_e":{"source":{"id":"stl_2098249","intersection":"Mississippi East"},"movements":{"NBL":183,"NBT":1968,"NBR":466,"SBL":0,"SBT":0,"SBR":0,"EBL":150,"EBT":253,"EBR":0,"WBL":0,"WBT":468,"WBR":64}},"tmc_sfsb_split":{"source":{"id":"stl_2098249","intersection":"Santa Fe SB"},"overrides":{"SBT":true,"SBL":true},"movements":{"NBL":0,"NBT":0,"NBR":0,"SBL":0,"SBT":2250,"SBR":397,"EBL":0,"EBT":0,"EBR":0,"WBL":0,"WBT":0,"WBR":0},"note":"StreetLight reports SBL 1125 and SBT 1125 for the same roadway continuing south (plus SBR 397). Combined as SBT 2250. The spreadsheet typed 2647 as through, which double-counted the 397 right turns in its approach total (3044)."},"tmc_ariz_sb":{"source":{"id":"stl_2098249","intersection":"Intersection 05"},"note":"StreetLight 'Intersection 05' = SB through just north of Arizona (no cross-street movements captured).","movements":{"NBL":0,"NBT":0,"NBR":0,"SBL":0,"SBT":2172,"SBR":0,"EBL":0,"EBT":0,"EBR":0,"WBL":0,"WBT":0,"WBR":0}},"tmc_ariz_nb":{"source":{"id":"stl_2098249","intersection":"Arizona"},"movements":{"NBL":0,"NBT":2623,"NBR":5,"SBL":0,"SBT":0,"SBR":0,"EBL":6,"EBT":0,"EBR":0,"WBL":0,"WBT":0,"WBR":8}},"tmc_lou_nb":{"source":{"id":"stl_2098249","intersection":"Lousiana"},"movements":{"NBL":0,"NBT":2629,"NBR":16,"SBL":0,"SBT":0,"SBR":0,"EBL":0,"EBT":0,"EBR":0,"WBL":0,"WBT":0,"WBR":9}},"tmc_florida":{"source":{"id":"stl_2098249","intersection":"Florida"},"movements":{"NBL":125,"NBT":2321,"NBR":8,"SBL":1,"SBT":2030,"SBR":16,"EBL":205,"EBT":2,"EBR":123,"WBL":22,"WBT":12,"WBR":4}}}}},"nodes":[{"id":"sb_n","type":"terminal","label":"I-25 SB from north","x":700,"y":20},{"id":"sb_8th_off","type":"junction","label":"","x":700,"y":150},{"id":"sb_8th_on","type":"junction","label":"","x":700,"y":210},{"id":"sb_6th_off","type":"junction","label":"","x":700,"y":340},{"id":"sb_6th_on","type":"junction","label":"","x":700,"y":440},{"id":"sb_alameda_off","type":"junction","label":"","x":700,"y":580},{"id":"sb_sf_off","type":"junction","label":"","x":700,"y":700},{"id":"sb_sf_on","type":"junction","label":"","x":700,"y":790},{"id":"sb_bwy_off","type":"junction","label":"","x":700,"y":930},{"id":"sb_frontage_off","type":"junction","label":"","x":700,"y":990},{"id":"sb_frontage_on","type":"junction","label":"","x":700,"y":1050},{"id":"sb_s","type":"terminal","label":"I-25 SB to south","x":700,"y":1180},{"id":"t_sb_8th_off","type":"terminal","label":"8th Ave off","x":520,"y":150},{"id":"t_sb_8th_on","type":"terminal","label":"8th Ave on","x":520,"y":210},{"id":"sb_6th_off_split","type":"junction","label":"","x":560,"y":340},{"id":"t_sb_6th_off_wb","type":"terminal","label":"to 6th Ave WB","x":420,"y":310},{"id":"t_sb_6th_off_eb","type":"terminal","label":"to 6th Ave EB","x":420,"y":370},{"id":"sb_6th_on_merge","type":"junction","label":"","x":560,"y":440},{"id":"t_sb_6th_on_wb","type":"terminal","label":"from 6th Ave WB","x":420,"y":410},{"id":"t_sb_6th_on_eb","type":"terminal","label":"from 6th Ave EB","x":420,"y":470},{"id":"t_sb_alameda_off","type":"terminal","label":"Alameda off","x":520,"y":580},{"id":"t_sb_bwy_off","type":"terminal","label":"S Broadway off","x":520,"y":930},{"id":"t_sb_frontage_off","type":"terminal","label":"Frontage off","x":520,"y":990},{"id":"t_sb_frontage_on","type":"terminal","label":"Frontage on","x":520,"y":1050},{"id":"nb_n","type":"terminal","label":"I-25 NB to north","x":860,"y":20},{"id":"nb_8th_on","type":"junction","label":"","x":860,"y":150},{"id":"nb_8th_off","type":"junction","label":"","x":860,"y":250},{"id":"nb_6th_on","type":"junction","label":"","x":860,"y":340},{"id":"nb_6th_off","type":"junction","label":"","x":860,"y":440},{"id":"nb_cedar_on","type":"junction","label":"","x":860,"y":580},{"id":"nb_sf_on","type":"junction","label":"","x":860,"y":700},{"id":"nb_sf_off","type":"junction","label":"","x":860,"y":790},{"id":"nb_ohio_on","type":"junction","label":"","x":860,"y":930},{"id":"nb_wash_on","type":"junction","label":"","x":860,"y":990},{"id":"nb_ohio_off","type":"junction","label":"","x":860,"y":1050},{"id":"nb_s","type":"terminal","label":"I-25 NB from south","x":860,"y":1180},{"id":"t_nb_8th_on","type":"terminal","label":"8th Ave on","x":1040,"y":150},{"id":"t_nb_8th_off","type":"terminal","label":"8th Ave off","x":1040,"y":250},{"id":"nb_6th_on_merge","type":"junction","label":"","x":1000,"y":340},{"id":"t_nb_6th_on_wb","type":"terminal","label":"from 6th Ave WB","x":1140,"y":310},{"id":"t_nb_6th_on_eb","type":"terminal","label":"from 6th Ave EB","x":1140,"y":370},{"id":"nb_6th_off_split","type":"junction","label":"","x":1000,"y":440},{"id":"t_nb_6th_off_wb","type":"terminal","label":"to 6th Ave WB","x":1140,"y":410},{"id":"t_nb_6th_off_eb","type":"terminal","label":"to 6th Ave EB","x":1140,"y":470},{"id":"t_nb_cedar_on","type":"terminal","label":"Cedar on","x":1040,"y":580},{"id":"t_nb_ohio_on","type":"terminal","label":"Ohio Ave on","x":1040,"y":930},{"id":"t_nb_wash_on","type":"terminal","label":"S Washington on","x":1040,"y":990},{"id":"t_nb_ohio_off","type":"terminal","label":"Ohio Ave off","x":1040,"y":1050},{"id":"kal_n","type":"terminal","label":"S Kalamath St (SB) from Alameda","x":1350,"y":520},{"id":"kal_diverge","type":"junction","label":"","x":1350,"y":640},{"id":"sfsb_merge","type":"junction","label":"","x":1350,"y":790},{"id":"sfnb_n","type":"terminal","label":"S Santa Fe Dr (NB) to Alameda","x":1700,"y":520},{"id":"sfnb_merge","type":"junction","label":"","x":1700,"y":640},{"id":"sfnb_diverge","type":"junction","label":"","x":1700,"y":790},{"id":"tmc_miss_w","type":"tmc","label":"S Platte River Dr (SB) @ Mississippi","x":1350,"y":960},{"id":"tmc_miss_e","type":"tmc","label":"Santa Fe Dr (NB) @ Mississippi","x":1700,"y":960},{"id":"t_miss_west","type":"terminal","label":"Mississippi Ave west","x":1150,"y":960},{"id":"t_miss_east","type":"terminal","label":"Mississippi Ave east","x":1900,"y":960},{"id":"tmc_sfsb_split","type":"tmc","label":"Santa Fe SB split (S Platte River Dr W)","x":1350,"y":1250},{"id":"t_platte_w","type":"terminal","label":"S Platte River Dr W","x":1150,"y":1250},{"id":"tmc_ariz_sb","type":"tmc","label":"Santa Fe Dr (SB) @ Arizona","x":1350,"y":1540},{"id":"tmc_ariz_nb","type":"tmc","label":"Santa Fe Dr (NB) @ Arizona","x":1700,"y":1540},{"id":"t_ariz_nb_w","type":"terminal","label":"S Platte River Dr E","x":1500,"y":1560},{"id":"t_ariz_nb_e","type":"terminal","label":"W Arizona Ave","x":1900,"y":1540},{"id":"tmc_lou_nb","type":"tmc","label":"Santa Fe Dr (NB) @ Louisiana","x":1700,"y":1830},{"id":"t_lou_e","type":"terminal","label":"W Louisiana Ave","x":1900,"y":1830},{"id":"tmc_florida","type":"tmc","label":"Santa Fe Dr @ Florida","x":1525,"y":2120},{"id":"t_florida_w","type":"terminal","label":"W Florida Ave west","x":1300,"y":2120},{"id":"t_florida_e","type":"terminal","label":"W Florida Ave east","x":1750,"y":2120},{"id":"t_florida_s","type":"terminal","label":"Santa Fe Dr south of Florida","x":1525,"y":2320}],"links":[{"id":"i25sb_n_8th","from":"sb_n","to":"sb_8th_off","cls":"interstate","label":"SB north of 8th"},{"id":"ramp_sb_8th_off","from":"sb_8th_off","to":"t_sb_8th_off","cls":"ramp"},{"id":"i25sb_8th_mid","from":"sb_8th_off","to":"sb_8th_on","cls":"interstate"},{"id":"ramp_sb_8th_on","from":"t_sb_8th_on","to":"sb_8th_on","cls":"ramp"},{"id":"i25sb_8th_6th","from":"sb_8th_on","to":"sb_6th_off","cls":"interstate","label":"SB 8th\u20136th"},{"id":"ramp_sb_6th_off","from":"sb_6th_off","to":"sb_6th_off_split","cls":"ramp","label":"6th Ave off"},{"id":"ramp_sb_6th_off_wb","from":"sb_6th_off_split","to":"t_sb_6th_off_wb","cls":"ramp"},{"id":"ramp_sb_6th_off_eb","from":"sb_6th_off_split","to":"t_sb_6th_off_eb","cls":"ramp"},{"id":"i25sb_6th_mid","from":"sb_6th_off","to":"sb_6th_on","cls":"interstate"},{"id":"ramp_sb_6th_on","from":"sb_6th_on_merge","to":"sb_6th_on","cls":"ramp","label":"6th Ave on"},{"id":"ramp_sb_6th_on_wb","from":"t_sb_6th_on_wb","to":"sb_6th_on_merge","cls":"ramp"},{"id":"ramp_sb_6th_on_eb","from":"t_sb_6th_on_eb","to":"sb_6th_on_merge","cls":"ramp"},{"id":"i25sb_6th_alameda","from":"sb_6th_on","to":"sb_alameda_off","cls":"interstate","label":"SB 6th\u2013Alameda"},{"id":"ramp_sb_alameda_off","from":"sb_alameda_off","to":"t_sb_alameda_off","cls":"ramp"},{"id":"i25sb_alameda_sf","from":"sb_alameda_off","to":"sb_sf_off","cls":"interstate","label":"SB Alameda\u2013Santa Fe"},{"id":"ramp_sb_sf_off","from":"sb_sf_off","to":"sfsb_merge","cls":"ramp","label":"Exit to Santa Fe SB","labelT":0.15},{"id":"i25sb_sf_mid","from":"sb_sf_off","to":"sb_sf_on","cls":"interstate"},{"id":"ramp_sb_sf_on","from":"kal_diverge","to":"sb_sf_on","cls":"ramp","label":"Kalamath on-ramp","labelT":0.6},{"id":"i25sb_sf_bwy","from":"sb_sf_on","to":"sb_bwy_off","cls":"interstate","label":"SB Santa Fe\u2013Broadway"},{"id":"ramp_sb_bwy_off","from":"sb_bwy_off","to":"t_sb_bwy_off","cls":"ramp"},{"id":"i25sb_bwy_mid","from":"sb_bwy_off","to":"sb_frontage_off","cls":"interstate"},{"id":"ramp_sb_frontage_off","from":"sb_frontage_off","to":"t_sb_frontage_off","cls":"ramp"},{"id":"i25sb_frontage_mid","from":"sb_frontage_off","to":"sb_frontage_on","cls":"interstate"},{"id":"ramp_sb_frontage_on","from":"t_sb_frontage_on","to":"sb_frontage_on","cls":"ramp"},{"id":"i25sb_arkansas","from":"sb_frontage_on","to":"sb_s","cls":"interstate","label":"SB at Arkansas Ave"},{"id":"i25nb_arkansas","from":"nb_s","to":"nb_ohio_off","cls":"interstate","label":"NB at Arkansas Ave"},{"id":"ramp_nb_ohio_off","from":"nb_ohio_off","to":"t_nb_ohio_off","cls":"ramp"},{"id":"i25nb_ohio_wash","from":"nb_ohio_off","to":"nb_wash_on","cls":"interstate"},{"id":"ramp_nb_wash_on","from":"t_nb_wash_on","to":"nb_wash_on","cls":"ramp"},{"id":"i25nb_wash_ohio","from":"nb_wash_on","to":"nb_ohio_on","cls":"interstate"},{"id":"ramp_nb_ohio_on","from":"t_nb_ohio_on","to":"nb_ohio_on","cls":"ramp"},{"id":"i25nb_ohio_sf","from":"nb_ohio_on","to":"nb_sf_off","cls":"interstate","label":"NB Broadway\u2013Santa Fe"},{"id":"ramp_nb_sf_off","from":"nb_sf_off","to":"sfnb_merge","cls":"ramp","label":"Exit to Santa Fe NB","labelT":0.35},{"id":"i25nb_sf_mid","from":"nb_sf_off","to":"nb_sf_on","cls":"interstate"},{"id":"ramp_nb_sf_on","from":"sfnb_diverge","to":"nb_sf_on","cls":"ramp","label":"Santa Fe on-ramp","labelT":0.55},{"id":"i25nb_sf_cedar","from":"nb_sf_on","to":"nb_cedar_on","cls":"interstate","label":"NB Santa Fe\u2013Cedar"},{"id":"ramp_nb_cedar_on","from":"t_nb_cedar_on","to":"nb_cedar_on","cls":"ramp"},{"id":"i25nb_cedar_6th","from":"nb_cedar_on","to":"nb_6th_off","cls":"interstate","label":"NB Alameda\u20136th"},{"id":"ramp_nb_6th_off","from":"nb_6th_off","to":"nb_6th_off_split","cls":"ramp","label":"6th Ave off"},{"id":"ramp_nb_6th_off_wb","from":"nb_6th_off_split","to":"t_nb_6th_off_wb","cls":"ramp"},{"id":"ramp_nb_6th_off_eb","from":"nb_6th_off_split","to":"t_nb_6th_off_eb","cls":"ramp"},{"id":"i25nb_6th_mid","from":"nb_6th_off","to":"nb_6th_on","cls":"interstate"},{"id":"ramp_nb_6th_on","from":"nb_6th_on_merge","to":"nb_6th_on","cls":"ramp","label":"6th Ave on"},{"id":"ramp_nb_6th_on_wb","from":"t_nb_6th_on_wb","to":"nb_6th_on_merge","cls":"ramp"},{"id":"ramp_nb_6th_on_eb","from":"t_nb_6th_on_eb","to":"nb_6th_on_merge","cls":"ramp"},{"id":"i25nb_6th_8th","from":"nb_6th_on","to":"nb_8th_off","cls":"interstate","label":"NB 6th\u20138th"},{"id":"ramp_nb_8th_off","from":"nb_8th_off","to":"t_nb_8th_off","cls":"ramp"},{"id":"i25nb_8th_mid","from":"nb_8th_off","to":"nb_8th_on","cls":"interstate","label":"NB at 8th Ave"},{"id":"ramp_nb_8th_on","from":"t_nb_8th_on","to":"nb_8th_on","cls":"ramp"},{"id":"i25nb_8th_n","from":"nb_8th_on","to":"nb_n","cls":"interstate","label":"NB north of 8th"},{"id":"kal_alameda_i25","from":"kal_n","to":"kal_diverge","cls":"street","label":"Kalamath SB at Alameda"},{"id":"kal_mid","from":"kal_diverge","to":"sfsb_merge","cls":"street","label":"Kalamath SB under I-25"},{"id":"sfsb_i25_miss","from":"sfsb_merge","to":"tmc_miss_w","cls":"street","label":"Santa Fe SB, I-25 to Mississippi","toLeg":"N"},{"id":"sfnb_miss_i25","from":"tmc_miss_e","to":"sfnb_diverge","cls":"street","label":"Santa Fe NB, Mississippi to I-25","fromLeg":"N"},{"id":"sfnb_mid","from":"sfnb_diverge","to":"sfnb_merge","cls":"street","label":"Santa Fe NB under I-25"},{"id":"sfnb_i25_alameda","from":"sfnb_merge","to":"sfnb_n","cls":"street","label":"Santa Fe NB at Alameda"},{"id":"miss_w_in","from":"t_miss_west","to":"tmc_miss_w","cls":"street","label":"EB approach","toLeg":"W","labelDy":18},{"id":"miss_w_out","from":"tmc_miss_w","to":"t_miss_west","cls":"street","label":"WB departure","fromLeg":"W","labelDy":-18},{"id":"miss_mid_eb","from":"tmc_miss_w","to":"tmc_miss_e","cls":"street","label":"Mississippi EB mid-block","fromLeg":"E","toLeg":"W","labelDy":14},{"id":"miss_mid_wb","from":"tmc_miss_e","to":"tmc_miss_w","cls":"street","label":"Mississippi WB mid-block","fromLeg":"W","toLeg":"E","labelDy":-26,"chipsUp":true},{"id":"miss_e_in","from":"t_miss_east","to":"tmc_miss_e","cls":"street","label":"WB approach","toLeg":"E","labelDy":-18},{"id":"miss_e_out","from":"tmc_miss_e","to":"t_miss_east","cls":"street","label":"EB departure","fromLeg":"E","labelDy":18},{"id":"sfsb_miss_split","from":"tmc_miss_w","to":"tmc_sfsb_split","cls":"street","label":"Santa Fe SB, Mississippi to split","fromLeg":"S","toLeg":"N"},{"id":"sfsb_split_w","from":"tmc_sfsb_split","to":"t_platte_w","cls":"street","label":"to S Platte River Dr W","fromLeg":"W"},{"id":"sfsb_split_ariz","from":"tmc_sfsb_split","to":"tmc_ariz_sb","cls":"street","label":"Santa Fe SB, split to Arizona","fromLeg":"S","toLeg":"N"},{"id":"ariz_nb_w_in","from":"t_ariz_nb_w","to":"tmc_ariz_nb","cls":"street","toLeg":"W","labelDy":18},{"id":"ariz_nb_w_out","from":"tmc_ariz_nb","to":"t_ariz_nb_w","cls":"street","fromLeg":"W","labelDy":-18},{"id":"ariz_nb_e_in","from":"t_ariz_nb_e","to":"tmc_ariz_nb","cls":"street","toLeg":"E","labelDy":-18},{"id":"ariz_nb_e_out","from":"tmc_ariz_nb","to":"t_ariz_nb_e","cls":"street","fromLeg":"E","labelDy":18},{"id":"sfnb_ariz_miss","from":"tmc_ariz_nb","to":"tmc_miss_e","cls":"street","label":"Santa Fe NB, Arizona to Mississippi","fromLeg":"N","toLeg":"S"},{"id":"lou_e_in","from":"t_lou_e","to":"tmc_lou_nb","cls":"street","toLeg":"E","labelDy":-18},{"id":"lou_e_out","from":"tmc_lou_nb","to":"t_lou_e","cls":"street","fromLeg":"E","labelDy":18},{"id":"sfnb_lou_ariz","from":"tmc_lou_nb","to":"tmc_ariz_nb","cls":"street","label":"Santa Fe NB, Louisiana to Arizona","fromLeg":"N","toLeg":"S"},{"id":"sfsb_ariz_florida","from":"tmc_ariz_sb","to":"tmc_florida","cls":"street","label":"Santa Fe SB, Arizona to Florida","fromLeg":"S","toLeg":"N"},{"id":"sfnb_florida_lou","from":"tmc_florida","to":"tmc_lou_nb","cls":"street","label":"Santa Fe NB, Florida to Louisiana","fromLeg":"N","toLeg":"S"},{"id":"florida_s_in","from":"t_florida_s","to":"tmc_florida","cls":"street","label":"NB from south","toLeg":"S","labelDx":34},{"id":"florida_s_out","from":"tmc_florida","to":"t_florida_s","cls":"street","label":"SB to south","fromLeg":"S","labelDx":-34},{"id":"florida_w_in","from":"t_florida_w","to":"tmc_florida","cls":"street","toLeg":"W","labelDy":18},{"id":"florida_w_out","from":"tmc_florida","to":"t_florida_w","cls":"street","fromLeg":"W","labelDy":-18},{"id":"florida_e_in","from":"t_florida_e","to":"tmc_florida","cls":"street","toLeg":"E","labelDy":-18},{"id":"florida_e_out","from":"tmc_florida","to":"t_florida_e","cls":"street","fromLeg":"E","labelDy":18}],"sources":{"stl_2098249":{"name":"StreetLight TMC 2098249 (S Platte River Dr)","kind":"streetlight_tmc","period":"Sep 01, 2025 - Oct 31, 2025; Apr 01, 2026 - May 31, 2026","imported":"2026-11-02","data":{"Mississippi West":{"0: All Days (M-Su)":{"600":[0,0,0,4,277,17,0,48,10,10,13,0],"615":[0,0,0,5,333,16,0,69,21,15,16,0],"630":[0,0,0,5,384,15,0,73,23,26,19,0],"645":[0,0,0,5,401,18,0,70,28,35,29,0],"700":[0,0,0,8,393,25,0,77,31,36,36,0],"715":[0,0,0,9,432,29,0,99,34,50,45,0],"730":[0,0,0,8,468,26,0,114,47,62,43,0],"745":[0,0,0,10,471,26,0,112,46,58,51,0],"800":[0,0,0,11,447,27,0,122,40,54,56,0],"815":[0,0,0,13,462,27,0,104,43,60,54,0],"830":[0,0,0,14,479,27,0,102,38,61,60,0],"845":[0,0,0,16,470,30,0,103,35,59,66,0],"900":[0,0,0,15,433,29,0,94,27,55,54,0],"915":[0,0,0,15,447,30,0,82,25,51,45,0],"930":[0,0,0,15,447,32,0,86,27,63,44,0],"945":[0,0,0,16,479,40,0,78,23,58,51,0],"1500":[0,0,0,16,530,38,0,93,32,66,85,0],"1515":[0,0,0,15,549,38,0,87,31,64,89,0],"1530":[0,0,0,15,561,36,0,99,36,67,90,0],"1545":[0,0,0,15,574,34,0,98,39,63,96,0],"1600":[0,0,0,18,566,35,0,101,47,62,105,0],"1615":[0,0,0,15,592,33,0,93,46,62,111,0],"1630":[0,0,0,17,587,39,0,100,44,62,115,0],"1645":[0,0,0,18,587,37,0,92,42,61,112,0],"1700":[0,0,0,18,588,39,0,95,44,61,112,0],"1715":[0,0,0,19,577,39,0,89,40,63,107,0],"1730":[0,0,0,16,557,45,0,84,34,57,111,0],"1745":[0,0,0,16,509,39,0,76,29,57,86,0],"1800":[0,0,0,17,532,49,0,73,25,57,88,0],"1815":[0,0,0,18,542,48,0,81,26,61,83,0],"1830":[0,0,0,17,563,54,0,76,23,60,75,0],"1845":[0,0,0,16,526,57,0,73,20,54,64,0]},"1: Weekday (Tu-Th)":{"600":[0,0,0,5,352,21,0,63,13,12,17,0],"615":[0,0,0,6,418,19,0,88,29,19,20,0],"630":[0,0,0,7,470,17,0,95,30,36,25,0],"645":[0,0,0,6,479,20,0,88,38,48,39,0],"700":[0,0,0,10,468,30,0,97,42,49,47,0],"715":[0,0,0,10,502,31,0,127,46,67,61,0],"730":[0,0,0,8,529,25,0,145,65,82,59,0],"745":[0,0,0,10,501,21,0,143,64,74,67,0],"800":[0,0,0,13,487,27,0,157,54,73,77,0],"815":[0,0,0,15,499,24,0,128,58,78,72,0],"830":[0,0,0,16,501,25,0,120,48,74,84,0],"845":[0,0,0,17,477,25,0,120,42,69,85,0],"900":[0,0,0,18,427,28,0,107,31,66,68,0],"915":[0,0,0,15,433,29,0,90,27,59,54,0],"930":[0,0,0,15,409,26,0,90,27,65,52,0],"945":[0,0,0,16,435,31,0,79,23,62,54,0],"1500":[0,0,0,13,498,32,0,93,36,68,90,0],"1515":[0,0,0,13,520,31,0,85,31,66,96,0],"1530":[0,0,0,14,535,26,0,104,44,68,101,0],"1545":[0,0,0,13,551,26,0,105,45,64,109,0],"1600":[0,0,0,15,551,24,0,111,59,64,124,0],"1615":[0,0,0,15,576,23,0,95,60,61,129,0],"1630":[0,0,0,15,567,25,0,114,59,61,133,0],"1645":[0,0,0,17,570,23,0,100,56,59,132,0],"1700":[0,0,0,17,573,27,0,100,54,61,133,0],"1715":[0,0,0,16,564,26,0,92,50,66,131,0],"1730":[0,0,0,15,547,31,0,87,40,58,131,0],"1745":[0,0,0,15,508,28,0,74,31,61,109,0],"1800":[0,0,0,16,531,36,0,74,28,61,107,0],"1815":[0,0,0,19,540,36,0,76,28,66,97,0],"1830":[0,0,0,17,560,44,0,69,23,65,83,0],"1845":[0,0,0,15,521,50,0,66,19,58,71,0]},"2: Weekend (Sa-Su)":{"600":[0,0,0,2,110,5,0,18,4,4,4,0],"615":[0,0,0,3,138,11,0,19,6,6,4,0],"630":[0,0,0,2,182,11,0,23,9,9,6,0],"645":[0,0,0,4,219,13,0,29,10,11,7,0],"700":[0,0,0,4,215,13,0,30,8,11,8,0],"715":[0,0,0,5,268,22,0,35,8,16,10,0],"730":[0,0,0,5,343,24,0,45,15,24,13,0],"745":[0,0,0,7,381,34,0,42,17,26,19,0],"800":[0,0,0,7,351,32,0,40,14,20,14,0],"815":[0,0,0,8,388,32,0,49,15,27,20,0],"830":[0,0,0,11,449,32,0,59,18,32,20,0],"845":[0,0,0,11,473,41,0,66,21,40,30,0],"900":[0,0,0,10,453,34,0,67,21,40,26,0],"915":[0,0,0,14,494,37,0,70,20,40,30,0],"930":[0,0,0,14,541,46,0,76,24,57,34,0],"945":[0,0,0,16,595,61,0,75,23,57,44,0],"1100":[0,0,0,23,572,50,0,87,26,72,61,0],"1115":[0,0,0,20,578,52,0,84,27,69,54,0],"1130":[0,0,0,18,570,45,0,86,26,80,66,0],"1145":[0,0,0,20,598,47,0,94,28,77,71,0],"1200":[0,0,0,16,569,52,0,90,29,81,67,0],"1215":[0,0,0,16,596,52,0,95,30,78,72,0],"1230":[0,0,0,20,568,45,0,104,26,82,78,0],"1245":[0,0,0,19,592,51,0,96,29,75,79,0],"1300":[0,0,0,19,566,44,0,107,34,83,84,0],"1500":[0,0,0,20,603,54,0,94,25,61,71,0],"1515":[0,0,0,17,617,56,0,86,25,63,68,0],"1530":[0,0,0,18,622,55,0,89,21,63,65,0],"1545":[0,0,0,20,625,52,0,86,27,63,66,0],"1600":[0,0,0,20,606,58,0,86,22,61,61,0],"1615":[0,0,0,18,631,54,0,91,24,63,68,0],"1630":[0,0,0,20,626,65,0,82,23,62,69,0],"1645":[0,0,0,18,627,63,0,87,21,65,67,0],"1700":[0,0,0,15,614,66,0,84,27,58,71,0],"1715":[0,0,0,20,592,66,0,90,23,59,68,0],"1730":[0,0,0,17,574,68,0,82,24,56,71,0],"1745":[0,0,0,18,527,58,0,80,23,52,53,0],"1800":[0,0,0,18,550,69,0,71,20,52,58,0],"1815":[0,0,0,19,567,68,0,88,21,60,60,0],"1830":[0,0,0,20,597,69,0,92,21,54,58,0],"1845":[0,0,0,19,558,71,0,82,23,46,53,0]}},"Mississippi East":{"0: All Days (M-Su)":{"600":[8,293,11,0,0,0,37,12,0,0,14,7],"615":[8,371,17,0,0,0,51,17,0,0,23,9],"630":[12,454,24,0,0,0,54,19,0,0,35,10],"645":[20,446,32,0,0,0,49,21,0,0,46,10],"700":[19,453,41,0,0,0,52,27,0,0,54,13],"715":[22,536,57,0,0,0,60,42,0,0,74,11],"730":[21,583,77,0,0,0,55,61,0,0,85,12],"745":[29,541,107,0,0,0,44,76,0,0,82,11],"800":[32,531,110,0,0,0,41,86,0,0,80,12],"815":[30,567,101,0,0,0,46,68,0,0,83,13],"830":[32,577,99,0,0,0,48,63,0,0,91,15],"845":[35,510,103,0,0,0,49,65,0,0,90,14],"900":[28,472,82,0,0,0,54,53,0,0,81,14],"915":[26,519,71,0,0,0,51,41,0,0,72,17],"930":[24,518,68,0,0,0,59,38,0,0,82,17],"945":[27,530,70,0,0,0,52,38,0,0,85,17],"1500":[38,439,93,0,0,0,47,57,0,0,114,17],"1515":[38,458,99,0,0,0,43,58,0,0,115,15],"1530":[42,459,105,0,0,0,42,69,0,0,116,17],"1545":[41,447,113,0,0,0,39,70,0,0,120,15],"1600":[42,466,114,0,0,0,40,77,0,0,125,16],"1615":[48,475,121,0,0,0,37,69,0,0,125,14],"1630":[52,484,122,0,0,0,37,76,0,0,124,14],"1645":[51,486,123,0,0,0,36,72,0,0,120,14],"1700":[50,491,120,0,0,0,37,73,0,0,122,16],"1715":[49,509,128,0,0,0,37,69,0,0,120,17],"1730":[47,480,119,0,0,0,37,61,0,0,121,16],"1745":[37,488,99,0,0,0,39,50,0,0,105,15],"1800":[38,474,89,0,0,0,40,47,0,0,105,17],"1815":[36,519,80,0,0,0,50,47,0,0,107,18],"1830":[31,552,75,0,0,0,50,41,0,0,104,19],"1845":[30,515,64,0,0,0,51,36,0,0,88,18]},"1: Weekday (Tu-Th)":{"600":[11,385,16,0,0,0,48,16,0,0,19,8],"615":[12,471,24,0,0,0,63,23,0,0,29,10],"630":[15,571,32,0,0,0,67,27,0,0,47,12],"645":[28,572,43,0,0,0,61,26,0,0,62,12],"700":[26,581,58,0,0,0,65,34,0,0,73,15],"715":[29,682,82,0,0,0,71,57,0,0,102,12],"730":[27,725,113,0,0,0,59,87,0,0,114,14],"745":[38,664,162,0,0,0,42,108,0,0,108,12],"800":[45,650,168,0,0,0,43,121,0,0,108,13],"815":[39,669,148,0,0,0,44,95,0,0,111,14],"830":[43,655,146,0,0,0,46,85,0,0,117,14],"845":[47,552,151,0,0,0,45,87,0,0,108,14],"900":[37,513,118,0,0,0,53,69,0,0,96,13],"915":[31,531,96,0,0,0,52,51,0,0,84,16],"930":[28,512,85,0,0,0,58,42,0,0,89,17],"945":[30,514,79,0,0,0,53,38,0,0,90,15],"1500":[40,382,102,0,0,0,38,64,0,0,118,17],"1515":[40,407,110,0,0,0,33,64,0,0,125,13],"1530":[44,398,121,0,0,0,34,81,0,0,125,15],"1545":[46,380,131,0,0,0,27,88,0,0,129,12],"1600":[48,399,133,0,0,0,30,93,0,0,139,14],"1615":[56,417,140,0,0,0,24,86,0,0,133,10],"1630":[58,405,145,0,0,0,27,99,0,0,135,11],"1645":[60,423,147,0,0,0,24,92,0,0,131,11],"1700":[60,422,142,0,0,0,25,90,0,0,133,13],"1715":[59,451,152,0,0,0,24,82,0,0,136,13],"1730":[56,423,145,0,0,0,28,72,0,0,134,13],"1745":[47,444,119,0,0,0,29,59,0,0,122,12],"1800":[44,436,100,0,0,0,33,54,0,0,122,17],"1815":[41,492,91,0,0,0,41,52,0,0,122,16],"1830":[34,539,82,0,0,0,41,41,0,0,112,19],"1845":[34,500,69,0,0,0,46,35,0,0,95,16]},"2: Weekend (Sa-Su)":{"600":[2,117,2,0,0,0,15,4,0,0,6,4],"615":[2,163,5,0,0,0,17,4,0,0,8,6],"630":[4,211,9,0,0,0,20,4,0,0,11,6],"645":[5,198,11,0,0,0,22,9,0,0,14,4],"700":[5,203,8,0,0,0,21,11,0,0,13,8],"715":[7,262,11,0,0,0,29,9,0,0,20,7],"730":[8,303,13,0,0,0,33,15,0,0,31,8],"745":[12,303,17,0,0,0,31,17,0,0,31,9],"800":[8,311,17,0,0,0,30,16,0,0,26,11],"815":[11,368,26,0,0,0,37,18,0,0,36,12],"830":[15,435,28,0,0,0,43,24,0,0,40,15],"845":[17,458,32,0,0,0,46,27,0,0,52,15],"900":[13,422,31,0,0,0,47,28,0,0,53,15],"915":[15,509,38,0,0,0,49,29,0,0,56,18],"930":[17,553,47,0,0,0,58,28,0,0,72,18],"945":[24,595,66,0,0,0,52,36,0,0,80,21],"1100":[31,572,69,0,0,0,60,46,0,0,96,21],"1115":[30,640,71,0,0,0,59,43,0,0,97,25],"1130":[33,617,73,0,0,0,58,42,0,0,109,25],"1145":[37,661,85,0,0,0,67,43,0,0,115,25],"1200":[30,615,88,0,0,0,61,42,0,0,112,24],"1215":[36,672,88,0,0,0,63,43,0,0,117,21],"1230":[38,655,89,0,0,0,71,47,0,0,117,21],"1245":[41,640,95,0,0,0,64,46,0,0,117,21],"1300":[39,579,86,0,0,0,73,47,0,0,125,22],"1500":[34,550,70,0,0,0,65,41,0,0,101,18],"1515":[30,574,69,0,0,0,63,40,0,0,100,19],"1530":[34,585,77,0,0,0,60,44,0,0,95,20],"1545":[31,577,76,0,0,0,64,38,0,0,99,22],"1600":[29,599,79,0,0,0,61,44,0,0,93,20],"1615":[29,600,80,0,0,0,64,40,0,0,100,24],"1630":[34,653,81,0,0,0,60,38,0,0,98,20],"1645":[33,624,85,0,0,0,59,43,0,0,96,21],"1700":[33,627,88,0,0,0,58,39,0,0,97,19],"1715":[35,613,82,0,0,0,61,45,0,0,88,23],"1730":[31,592,77,0,0,0,55,42,0,0,95,21],"1745":[23,570,63,0,0,0,61,34,0,0,83,20],"1800":[29,544,62,0,0,0,49,37,0,0,81,16],"1815":[27,568,59,0,0,0,61,43,0,0,90,20],"1830":[25,586,60,0,0,0,66,44,0,0,89,20],"1845":[25,553,51,0,0,0,60,36,0,0,71,23]}},"Santa Fe SB":{"0: All Days (M-Su)":{"600":[0,0,0,132,132,41,0,0,0,0,0,0],"615":[0,0,0,167,167,41,0,0,0,0,0,0],"630":[0,0,0,199,199,43,0,0,0,0,0,0],"645":[0,0,0,202,202,61,0,0,0,0,0,0],"700":[0,0,0,201,201,60,0,0,0,0,0,0],"715":[0,0,0,228,228,62,0,0,0,0,0,0],"730":[0,0,0,261,261,62,0,0,0,0,0,0],"745":[0,0,0,260,260,66,0,0,0,0,0,0],"800":[0,0,0,242,242,61,0,0,0,0,0,0],"815":[0,0,0,256,256,64,0,0,0,0,0,0],"830":[0,0,0,264,264,60,0,0,0,0,0,0],"845":[0,0,0,251,251,70,0,0,0,0,0,0],"900":[0,0,0,224,224,67,0,0,0,0,0,0],"915":[0,0,0,226,226,66,0,0,0,0,0,0],"930":[0,0,0,241,241,71,0,0,0,0,0,0],"945":[0,0,0,243,243,73,0,0,0,0,0,0],"1500":[0,0,0,269,269,97,0,0,0,0,0,0],"1515":[0,0,0,276,276,96,0,0,0,0,0,0],"1530":[0,0,0,288,288,95,0,0,0,0,0,0],"1545":[0,0,0,293,293,97,0,0,0,0,0,0],"1600":[0,0,0,292,292,96,0,0,0,0,0,0],"1615":[0,0,0,307,307,97,0,0,0,0,0,0],"1630":[0,0,0,303,303,95,0,0,0,0,0,0],"1645":[0,0,0,300,300,99,0,0,0,0,0,0],"1700":[0,0,0,300,300,102,0,0,0,0,0,0],"1715":[0,0,0,294,294,103,0,0,0,0,0,0],"1730":[0,0,0,277,277,101,0,0,0,0,0,0],"1745":[0,0,0,254,254,91,0,0,0,0,0,0],"1800":[0,0,0,256,256,108,0,0,0,0,0,0],"1815":[0,0,0,262,262,106,0,0,0,0,0,0],"1830":[0,0,0,270,270,112,0,0,0,0,0,0],"1845":[0,0,0,250,250,107,0,0,0,0,0,0]},"1: Weekday (Tu-Th)":{"600":[0,0,0,168,168,53,0,0,0,0,0,0],"615":[0,0,0,211,211,50,0,0,0,0,0,0],"630":[0,0,0,247,247,52,0,0,0,0,0,0],"645":[0,0,0,244,244,77,0,0,0,0,0,0],"700":[0,0,0,242,242,75,0,0,0,0,0,0],"715":[0,0,0,272,272,74,0,0,0,0,0,0],"730":[0,0,0,307,307,69,0,0,0,0,0,0],"745":[0,0,0,290,290,72,0,0,0,0,0,0],"800":[0,0,0,277,277,64,0,0,0,0,0,0],"815":[0,0,0,289,289,70,0,0,0,0,0,0],"830":[0,0,0,287,287,61,0,0,0,0,0,0],"845":[0,0,0,265,265,66,0,0,0,0,0,0],"900":[0,0,0,227,227,70,0,0,0,0,0,0],"915":[0,0,0,222,222,68,0,0,0,0,0,0],"930":[0,0,0,224,224,67,0,0,0,0,0,0],"945":[0,0,0,224,224,72,0,0,0,0,0,0],"1500":[0,0,0,261,261,89,0,0,0,0,0,0],"1515":[0,0,0,268,268,89,0,0,0,0,0,0],"1530":[0,0,0,286,286,84,0,0,0,0,0,0],"1545":[0,0,0,293,293,83,0,0,0,0,0,0],"1600":[0,0,0,301,301,84,0,0,0,0,0,0],"1615":[0,0,0,314,314,84,0,0,0,0,0,0],"1630":[0,0,0,310,310,81,0,0,0,0,0,0],"1645":[0,0,0,309,309,84,0,0,0,0,0,0],"1700":[0,0,0,306,306,89,0,0,0,0,0,0],"1715":[0,0,0,300,300,92,0,0,0,0,0,0],"1730":[0,0,0,282,282,90,0,0,0,0,0,0],"1745":[0,0,0,262,262,82,0,0,0,0,0,0],"1800":[0,0,0,264,264,100,0,0,0,0,0,0],"1815":[0,0,0,265,265,103,0,0,0,0,0,0],"1830":[0,0,0,276,276,105,0,0,0,0,0,0],"1845":[0,0,0,251,251,106,0,0,0,0,0,0]},"2: Weekend (Sa-Su)":{"600":[0,0,0,53,53,14,0,0,0,0,0,0],"615":[0,0,0,68,68,18,0,0,0,0,0,0],"630":[0,0,0,94,94,18,0,0,0,0,0,0],"645":[0,0,0,108,108,26,0,0,0,0,0,0],"700":[0,0,0,108,108,23,0,0,0,0,0,0],"715":[0,0,0,135,135,29,0,0,0,0,0,0],"730":[0,0,0,176,176,37,0,0,0,0,0,0],"745":[0,0,0,194,194,45,0,0,0,0,0,0],"800":[0,0,0,174,174,43,0,0,0,0,0,0],"815":[0,0,0,198,198,47,0,0,0,0,0,0],"830":[0,0,0,228,228,54,0,0,0,0,0,0],"845":[0,0,0,236,236,69,0,0,0,0,0,0],"900":[0,0,0,228,228,63,0,0,0,0,0,0],"915":[0,0,0,244,244,65,0,0,0,0,0,0],"930":[0,0,0,281,281,77,0,0,0,0,0,0],"945":[0,0,0,299,299,79,0,0,0,0,0,0],"1100":[0,0,0,298,298,92,0,0,0,0,0,0],"1115":[0,0,0,293,293,86,0,0,0,0,0,0],"1130":[0,0,0,307,307,87,0,0,0,0,0,0],"1145":[0,0,0,306,306,91,0,0,0,0,0,0],"1200":[0,0,0,302,302,93,0,0,0,0,0,0],"1215":[0,0,0,300,300,100,0,0,0,0,0,0],"1230":[0,0,0,301,301,96,0,0,0,0,0,0],"1245":[0,0,0,299,299,93,0,0,0,0,0,0],"1300":[0,0,0,301,301,97,0,0,0,0,0,0],"1500":[0,0,0,293,293,108,0,0,0,0,0,0],"1515":[0,0,0,297,297,110,0,0,0,0,0,0],"1530":[0,0,0,301,301,114,0,0,0,0,0,0],"1545":[0,0,0,298,298,120,0,0,0,0,0,0],"1600":[0,0,0,290,290,113,0,0,0,0,0,0],"1615":[0,0,0,300,300,122,0,0,0,0,0,0],"1630":[0,0,0,298,298,120,0,0,0,0,0,0],"1645":[0,0,0,295,295,124,0,0,0,0,0,0],"1700":[0,0,0,289,289,124,0,0,0,0,0,0],"1715":[0,0,0,281,281,116,0,0,0,0,0,0],"1730":[0,0,0,270,270,118,0,0,0,0,0,0],"1745":[0,0,0,247,247,106,0,0,0,0,0,0],"1800":[0,0,0,251,251,122,0,0,0,0,0,0],"1815":[0,0,0,266,266,116,0,0,0,0,0,0],"1830":[0,0,0,275,275,123,0,0,0,0,0,0],"1845":[0,0,0,262,262,112,0,0,0,0,0,0]}},"Florida":{"0: All Days (M-Su)":{"600":[3,268,1,0,245,1,49,1,13,0,0,0],"615":[4,346,1,0,303,1,53,0,16,0,0,0],"630":[5,427,3,0,360,1,56,0,18,1,1,0],"645":[8,433,5,0,365,1,47,1,19,2,0,0],"700":[9,456,3,0,360,1,51,1,20,2,0,0],"715":[14,557,1,0,408,1,54,1,29,3,0,0],"730":[14,608,3,1,466,2,53,1,39,8,0,1],"745":[12,589,3,1,472,1,62,2,43,5,1,1],"800":[10,595,3,1,431,2,65,1,37,4,0,0],"815":[11,613,2,1,461,1,60,1,39,3,0,1],"830":[12,624,2,1,468,1,62,1,33,3,0,1],"845":[14,558,2,1,448,2,52,1,34,2,1,0],"900":[11,499,3,1,392,2,51,1,24,2,0,1],"915":[10,504,2,1,393,1,54,0,20,2,0,0],"930":[12,552,2,1,419,2,56,1,24,2,1,1],"945":[13,502,2,1,422,2,52,0,25,2,0,1],"1500":[20,500,1,0,481,4,56,0,33,6,1,1],"1515":[23,511,1,1,493,4,50,0,33,7,2,0],"1530":[22,529,2,0,517,4,49,0,34,7,1,1],"1545":[26,520,2,0,526,4,49,1,38,5,3,1],"1600":[28,552,2,0,526,4,53,0,45,9,3,1],"1615":[32,564,2,0,555,3,51,0,41,8,3,1],"1630":[32,588,2,1,553,4,50,0,38,8,3,1],"1645":[32,582,2,0,541,4,51,1,36,7,2,1],"1700":[34,593,2,0,541,4,51,0,35,7,4,1],"1715":[33,607,2,0,533,4,52,1,35,7,4,1],"1730":[33,569,2,1,502,4,51,1,29,5,3,1],"1745":[25,552,2,0,454,4,51,0,24,3,1,1],"1800":[23,518,2,0,458,5,48,0,21,4,2,1],"1815":[22,553,2,1,459,4,60,1,27,6,2,1],"1830":[23,563,3,1,477,6,59,1,26,4,3,1],"1845":[21,492,2,1,437,7,55,1,24,2,1,1]},"1: Weekday (Tu-Th)":{"600":[4,352,1,0,310,1,66,1,17,0,0,0],"615":[5,440,2,0,385,1,72,1,21,0,0,0],"630":[7,544,4,0,447,1,71,0,22,1,1,0],"645":[11,563,5,1,443,1,60,1,24,2,0,1],"700":[12,600,3,0,437,1,64,1,27,3,0,0],"715":[20,730,1,1,486,1,64,1,41,5,0,0],"730":[17,786,3,1,553,2,58,1,54,13,1,1],"745":[17,763,5,1,526,2,70,2,58,8,1,1],"800":[13,779,3,1,501,2,77,2,51,6,1,0],"815":[16,763,4,1,521,1,68,2,53,4,1,1],"830":[16,752,2,1,514,1,64,1,42,4,1,1],"845":[17,660,3,1,475,1,56,1,41,3,1,0],"900":[13,572,3,1,395,1,53,1,27,3,0,1],"915":[11,538,3,1,387,1,58,0,22,2,0,1],"930":[14,565,2,1,388,2,55,1,25,2,1,1],"945":[13,496,3,1,388,1,51,0,24,2,0,1],"1500":[20,463,1,0,468,3,46,0,34,7,2,1],"1515":[23,484,1,0,481,2,40,0,37,9,3,1],"1530":[24,493,2,0,519,2,36,0,36,8,1,1],"1545":[30,492,2,0,533,3,38,1,44,8,4,1],"1600":[33,524,2,0,544,3,42,0,56,13,3,1],"1615":[39,545,3,0,578,2,42,0,49,12,4,1],"1630":[39,546,2,1,575,3,40,0,45,11,5,1],"1645":[40,565,2,0,563,3,42,1,44,9,3,1],"1700":[43,572,1,0,561,4,42,0,42,10,5,1],"1715":[41,605,2,1,553,4,45,1,43,10,7,1],"1730":[40,556,2,0,520,4,44,0,35,6,3,2],"1745":[29,549,2,0,481,3,41,0,26,5,2,1],"1800":[27,504,3,0,476,4,42,0,24,6,3,1],"1815":[24,554,2,1,470,4,56,0,27,8,3,1],"1830":[24,563,3,1,492,6,52,0,26,5,4,1],"1845":[22,488,2,1,436,6,52,1,24,3,1,1]},"2: Weekend (Sa-Su)":{"600":[1,105,0,0,97,0,15,0,5,0,0,0],"615":[1,151,0,0,124,0,16,0,6,0,0,0],"630":[2,190,0,0,164,1,23,0,8,0,0,0],"645":[5,185,0,0,196,0,21,0,8,0,0,0],"700":[3,184,0,0,192,1,22,0,8,0,0,0],"715":[3,247,0,0,243,1,25,0,10,0,0,0],"730":[4,277,0,1,308,1,30,0,13,1,0,0],"745":[4,284,1,0,354,1,34,0,16,0,0,0],"800":[4,289,1,0,304,1,36,0,12,1,0,1],"815":[4,351,0,0,362,1,33,0,14,1,0,0],"830":[5,425,0,0,393,1,50,0,17,0,0,0],"845":[8,423,1,0,425,2,44,0,20,1,0,0],"900":[6,410,1,0,401,1,46,0,22,1,0,0],"915":[6,468,0,0,427,1,51,0,17,0,0,0],"930":[11,560,1,1,495,2,57,0,22,1,0,0],"945":[13,554,1,1,523,4,55,0,26,2,0,1],"1100":[14,603,2,1,524,5,61,0,27,3,1,1],"1115":[14,609,1,1,510,4,64,0,24,2,0,1],"1130":[16,663,1,1,542,4,64,0,29,2,0,0],"1145":[16,654,2,1,535,5,64,0,26,1,0,1],"1200":[20,655,1,1,536,5,72,0,25,5,1,1],"1215":[16,663,0,0,521,5,71,0,28,3,1,1],"1230":[18,701,0,0,537,4,76,0,28,3,1,0],"1245":[17,638,1,0,523,6,69,0,28,4,0,1],"1300":[19,644,1,1,530,6,71,0,30,3,1,1],"1500":[18,565,1,1,519,6,73,0,29,2,0,1],"1515":[18,570,1,1,521,7,69,0,24,1,1,0],"1530":[15,600,1,1,535,7,73,0,26,3,1,0],"1545":[16,571,1,0,525,6,69,0,28,1,0,0],"1600":[19,616,1,0,520,5,79,1,25,1,0,0],"1615":[20,597,1,0,524,5,71,0,30,1,0,1],"1630":[21,670,1,1,535,4,75,0,25,2,0,0],"1645":[19,631,1,0,518,5,69,1,24,3,1,0],"1700":[18,657,2,0,513,5,71,0,25,1,0,0],"1715":[20,618,1,0,494,6,65,1,24,2,0,1],"1730":[20,610,2,1,476,6,64,0,21,1,1,0],"1745":[17,567,1,0,422,5,66,0,20,1,1,0],"1800":[18,537,1,0,454,5,58,0,19,1,0,0],"1815":[19,556,1,1,457,5,70,1,28,1,0,1],"1830":[21,571,2,0,488,8,70,0,25,1,1,0],"1845":[20,508,2,1,455,10,61,1,20,2,1,1]}},"Intersection 05":{"0: All Days (M-Su)":{"600":[0,0,0,0,257,0,0,0,0,0,0,0],"615":[0,0,0,0,322,0,0,0,0,0,0,0],"630":[0,0,0,0,383,0,0,0,0,0,0,0],"645":[0,0,0,0,389,0,0,0,0,0,0,0],"700":[0,0,0,0,386,0,0,0,0,0,0,0],"715":[0,0,0,0,440,0,0,0,0,0,0,0],"730":[0,0,0,0,503,0,0,0,0,0,0,0],"745":[0,0,0,1,502,0,0,0,0,0,0,0],"800":[0,0,0,1,468,0,0,0,0,0,0,0],"815":[0,0,0,1,494,0,0,0,0,0,0,0],"830":[0,0,0,0,510,0,0,0,0,0,0,0],"845":[0,0,0,0,484,0,0,0,0,0,0,0],"900":[0,0,0,0,431,0,0,0,0,0,0,0],"915":[0,0,0,0,433,0,0,0,0,0,0,0],"930":[0,0,0,0,467,0,0,0,0,0,0,0],"945":[0,0,0,0,466,0,0,0,0,0,0,0],"1500":[0,0,0,1,519,0,0,0,0,0,0,0],"1515":[0,0,0,0,533,0,0,0,0,0,0,0],"1530":[0,0,0,0,556,0,0,0,0,0,0,0],"1545":[0,0,0,0,566,0,0,0,0,0,0,0],"1600":[0,0,0,0,565,0,0,0,0,0,0,0],"1615":[0,0,0,0,593,0,0,0,0,0,0,0],"1630":[0,0,0,1,585,0,0,0,0,0,0,0],"1645":[0,0,0,1,579,0,0,0,0,0,0,0],"1700":[0,0,0,0,580,0,0,0,0,0,0,0],"1715":[0,0,0,0,568,0,0,0,0,0,0,0],"1730":[0,0,0,0,534,0,0,0,0,0,0,0],"1745":[0,0,0,0,490,0,0,0,0,0,0,0],"1800":[0,0,0,0,494,0,0,0,0,0,0,0],"1815":[0,0,0,0,504,0,0,0,0,0,0,0],"1830":[0,0,0,0,519,0,0,0,0,0,0,0],"1845":[0,0,0,0,481,0,0,0,0,0,0,0]},"1: Weekday (Tu-Th)":{"600":[0,0,0,0,327,0,0,0,0,0,0,0],"615":[0,0,0,0,406,0,0,0,0,0,0,0],"630":[0,0,0,1,475,0,0,0,0,0,0,0],"645":[0,0,0,0,471,0,0,0,0,0,0,0],"700":[0,0,0,0,466,0,0,0,0,0,0,0],"715":[0,0,0,1,524,0,0,0,0,0,0,0],"730":[0,0,0,0,593,0,0,0,0,0,0,0],"745":[0,0,0,1,560,0,0,0,0,0,0,0],"800":[0,0,0,1,536,0,0,0,0,0,0,0],"815":[0,0,0,1,557,0,0,0,0,0,0,0],"830":[0,0,0,1,555,0,0,0,0,0,0,0],"845":[0,0,0,0,512,0,0,0,0,0,0,0],"900":[0,0,0,0,437,0,0,0,0,0,0,0],"915":[0,0,0,1,425,0,0,0,0,0,0,0],"930":[0,0,0,0,435,0,0,0,0,0,0,0],"945":[0,0,0,1,431,0,0,0,0,0,0,0],"1500":[0,0,0,1,504,0,0,0,0,0,0,0],"1515":[0,0,0,1,517,0,0,0,0,0,0,0],"1530":[0,0,0,0,553,0,0,0,0,0,0,0],"1545":[0,0,0,0,566,0,0,0,0,0,0,0],"1600":[0,0,0,0,583,0,0,0,0,0,0,0],"1615":[0,0,0,1,609,0,0,0,0,0,0,0],"1630":[0,0,0,1,599,0,0,0,0,0,0,0],"1645":[0,0,0,1,596,0,0,0,0,0,0,0],"1700":[0,0,0,0,593,0,0,0,0,0,0,0],"1715":[0,0,0,0,580,0,0,0,0,0,0,0],"1730":[0,0,0,0,546,0,0,0,0,0,0,0],"1745":[0,0,0,1,507,0,0,0,0,0,0,0],"1800":[0,0,0,0,510,0,0,0,0,0,0,0],"1815":[0,0,0,0,513,0,0,0,0,0,0,0],"1830":[0,0,0,0,533,0,0,0,0,0,0,0],"1845":[0,0,0,0,482,0,0,0,0,0,0,0]},"2: Weekend (Sa-Su)":{"600":[0,0,0,0,104,0,0,0,0,0,0,0],"615":[0,0,0,0,130,0,0,0,0,0,0,0],"630":[0,0,0,0,180,0,0,0,0,0,0,0],"645":[0,0,0,0,208,0,0,0,0,0,0,0],"700":[0,0,0,0,208,0,0,0,0,0,0,0],"715":[0,0,0,0,260,0,0,0,0,0,0,0],"730":[0,0,0,0,338,0,0,0,0,0,0,0],"745":[0,0,0,0,373,0,0,0,0,0,0,0],"800":[0,0,0,0,336,0,0,0,0,0,0,0],"815":[0,0,0,0,382,0,0,0,0,0,0,0],"830":[0,0,0,0,438,0,0,0,0,0,0,0],"845":[0,0,0,0,455,0,0,0,0,0,0,0],"900":[0,0,0,0,438,0,0,0,0,0,0,0],"915":[0,0,0,0,467,0,0,0,0,0,0,0],"930":[0,0,0,1,545,0,0,0,0,0,0,0],"945":[0,0,0,0,569,0,0,0,0,0,0,0],"1100":[0,0,0,1,580,0,0,0,0,0,0,0],"1115":[0,0,0,1,559,0,0,0,0,0,0,0],"1130":[0,0,0,1,595,0,0,0,0,0,0,0],"1145":[0,0,0,1,585,0,0,0,0,0,0,0],"1200":[0,0,0,0,586,0,0,0,0,0,0,0],"1215":[0,0,0,1,574,0,0,0,0,0,0,0],"1230":[0,0,0,0,583,0,0,0,0,0,0,0],"1245":[0,0,0,0,573,0,0,0,0,0,0,0],"1300":[0,0,0,1,585,0,0,0,0,0,0,0],"1500":[0,0,0,0,562,0,0,0,0,0,0,0],"1515":[0,0,0,0,573,0,0,0,0,0,0,0],"1530":[0,0,0,0,578,0,0,0,0,0,0,0],"1545":[0,0,0,1,574,0,0,0,0,0,0,0],"1600":[0,0,0,0,559,0,0,0,0,0,0,0],"1615":[0,0,0,0,576,0,0,0,0,0,0,0],"1630":[0,0,0,1,574,0,0,0,0,0,0,0],"1645":[0,0,0,1,568,0,0,0,0,0,0,0],"1700":[0,0,0,0,557,0,0,0,0,0,0,0],"1715":[0,0,0,0,542,0,0,0,0,0,0,0],"1730":[0,0,0,0,520,0,0,0,0,0,0,0],"1745":[0,0,0,0,473,0,0,0,0,0,0,0],"1800":[0,0,0,1,485,0,0,0,0,0,0,0],"1815":[0,0,0,0,512,0,0,0,0,0,0,0],"1830":[0,0,0,0,530,0,0,0,0,0,0,0],"1845":[0,0,0,1,505,0,0,0,0,0,0,0]}},"Arizona":{"0: All Days (M-Su)":{"600":[0,322,0,0,0,0,1,0,0,0,0,1],"615":[0,405,0,0,0,0,1,0,0,0,0,1],"630":[0,493,1,0,0,0,3,0,0,0,0,1],"645":[0,498,1,0,0,0,2,0,0,0,0,1],"700":[0,518,1,0,0,0,3,0,0,0,0,1],"715":[0,619,1,0,0,0,4,0,0,0,0,2],"730":[0,683,3,0,0,0,3,0,0,0,0,2],"745":[0,671,2,0,0,0,2,0,0,0,0,2],"800":[0,681,3,0,0,0,4,0,0,0,0,2],"815":[0,696,2,0,0,0,3,0,0,0,0,2],"830":[0,711,2,0,0,0,5,0,0,0,0,2],"845":[0,642,2,0,0,0,5,0,0,0,0,2],"900":[0,589,2,0,0,0,4,0,0,0,0,2],"915":[0,594,1,0,0,0,4,0,0,0,0,3],"930":[0,639,1,0,0,0,4,0,0,0,0,2],"945":[0,600,1,0,0,0,3,0,0,0,0,3],"1500":[0,591,1,0,0,0,2,0,0,0,0,4],"1515":[0,594,1,0,0,0,2,0,0,0,0,3],"1530":[0,611,2,0,0,0,3,0,0,0,0,4],"1545":[0,599,1,0,0,0,2,0,0,0,0,2],"1600":[0,628,2,0,0,0,2,0,0,0,0,3],"1615":[0,643,1,0,0,0,2,0,0,0,0,3],"1630":[0,660,2,0,0,0,2,0,0,0,0,3],"1645":[0,659,1,0,0,0,2,0,0,0,0,3],"1700":[0,665,2,0,0,0,2,0,0,0,0,2],"1715":[0,685,1,0,0,0,2,0,0,0,0,2],"1730":[0,645,1,0,0,0,1,0,0,0,0,3],"1745":[0,628,1,0,0,0,1,0,0,0,0,1],"1800":[0,597,1,0,0,0,1,0,0,0,0,4],"1815":[0,637,1,0,0,0,1,0,0,0,0,2],"1830":[0,654,1,0,0,0,1,0,0,0,0,3],"1845":[0,594,1,0,0,0,1,0,0,0,0,2]},"1: Weekday (Tu-Th)":{"600":[0,424,1,0,0,0,1,0,0,0,0,1],"615":[0,517,0,0,0,0,2,0,0,0,0,1],"630":[0,626,1,0,0,0,3,0,0,0,0,2],"645":[0,644,1,0,0,0,2,0,0,0,0,2],"700":[0,670,1,0,0,0,4,0,0,0,0,2],"715":[0,800,2,0,0,0,4,0,0,0,0,2],"730":[0,864,4,0,0,0,4,0,0,0,0,3],"745":[0,857,4,0,0,0,3,0,0,0,0,2],"800":[0,869,5,0,0,0,5,0,0,0,0,3],"815":[0,856,3,0,0,0,4,0,0,0,0,3],"830":[0,841,2,0,0,0,6,0,0,0,0,3],"845":[0,745,3,0,0,0,5,0,0,0,0,3],"900":[0,668,3,0,0,0,4,0,0,0,0,2],"915":[0,636,2,0,0,0,4,0,0,0,0,3],"930":[0,651,2,0,0,0,4,0,0,0,0,3],"945":[0,594,2,0,0,0,3,0,0,0,0,3],"1500":[0,547,2,0,0,0,1,0,0,0,0,4],"1515":[0,557,2,0,0,0,2,0,0,0,0,3],"1530":[0,561,2,0,0,0,3,0,0,0,0,5],"1545":[0,556,1,0,0,0,1,0,0,0,0,2],"1600":[0,586,2,0,0,0,3,0,0,0,0,4],"1615":[0,610,2,0,0,0,2,0,0,0,0,3],"1630":[0,609,2,0,0,0,3,0,0,0,0,4],"1645":[0,628,1,0,0,0,2,0,0,0,0,3],"1700":[0,630,2,0,0,0,2,0,0,0,0,2],"1715":[0,663,2,0,0,0,1,0,0,0,0,3],"1730":[0,618,2,0,0,0,1,0,0,0,0,3],"1745":[0,615,1,0,0,0,1,0,0,0,0,2],"1800":[0,572,2,0,0,0,1,0,0,0,0,5],"1815":[0,628,2,0,0,0,1,0,0,0,0,3],"1830":[0,645,1,0,0,0,1,0,0,0,0,4],"1845":[0,586,0,0,0,0,1,0,0,0,0,3]},"2: Weekend (Sa-Su)":{"600":[0,122,0,0,0,0,0,0,0,0,0,0],"615":[0,171,0,0,0,0,1,0,0,0,0,0],"630":[0,226,0,0,0,0,1,0,0,0,0,1],"645":[0,211,0,0,0,0,1,0,0,0,0,1],"700":[0,222,0,0,0,0,2,0,0,0,0,0],"715":[0,277,0,0,0,0,3,0,0,0,0,1],"730":[0,332,0,0,0,0,2,0,0,0,0,1],"745":[0,326,0,0,0,0,1,0,0,0,0,1],"800":[0,346,0,0,0,0,2,0,0,0,0,2],"815":[0,399,1,0,0,0,1,0,0,0,0,1],"830":[0,496,0,0,0,0,3,0,0,0,0,0],"845":[0,493,0,0,0,0,4,0,0,0,0,1],"900":[0,485,1,0,0,0,3,0,0,0,0,2],"915":[0,544,1,0,0,0,6,0,0,0,0,2],"930":[0,647,1,0,0,0,4,0,0,0,0,1],"945":[0,657,1,0,0,0,2,0,0,0,0,2],"1100":[0,701,1,0,0,0,3,0,0,0,0,3],"1115":[0,717,1,0,0,0,4,0,0,0,0,2],"1130":[0,753,1,0,0,0,6,0,0,0,0,1],"1145":[0,759,1,0,0,0,3,0,0,0,0,2],"1200":[0,770,1,0,0,0,2,0,0,0,0,2],"1215":[0,771,1,0,0,0,4,0,0,0,0,3],"1230":[0,811,1,0,0,0,3,0,0,0,0,2],"1245":[0,755,1,0,0,0,4,0,0,0,0,3],"1300":[0,733,1,0,0,0,6,0,0,0,0,2],"1500":[0,670,1,0,0,0,1,0,0,0,0,1],"1515":[0,673,1,0,0,0,1,0,0,0,0,2],"1530":[0,708,1,0,0,0,3,0,0,0,0,2],"1545":[0,682,1,0,0,0,2,0,0,0,0,1],"1600":[0,718,1,0,0,0,2,0,0,0,0,1],"1615":[0,711,1,0,0,0,2,0,0,0,0,2],"1630":[0,774,1,0,0,0,4,0,0,0,0,2],"1645":[0,741,1,0,0,0,2,0,0,0,0,1],"1700":[0,753,1,0,0,0,1,0,0,0,0,1],"1715":[0,731,1,0,0,0,1,0,0,0,0,1],"1730":[0,707,0,0,0,0,1,0,0,0,0,1],"1745":[0,663,2,0,0,0,2,0,0,0,0,1],"1800":[0,634,1,0,0,0,2,0,0,0,0,1],"1815":[0,659,1,0,0,0,1,0,0,0,0,1],"1830":[0,679,0,0,0,0,1,0,0,0,0,1],"1845":[0,617,1,0,0,0,1,0,0,0,0,1]}},"Lousiana":{"0: All Days (M-Su)":{"600":[0,323,1,0,0,0,0,0,0,0,0,0],"615":[0,407,2,0,0,0,0,0,0,0,0,1],"630":[0,493,1,0,0,0,0,0,0,0,0,2],"645":[0,498,1,0,0,0,0,0,0,0,0,1],"700":[0,522,0,0,0,0,0,0,0,0,0,1],"715":[0,626,1,0,0,0,0,0,0,0,0,1],"730":[0,686,1,0,0,0,0,0,0,0,0,1],"745":[0,672,2,0,0,0,0,0,0,0,0,1],"800":[0,688,2,0,0,0,0,0,0,0,0,2],"815":[0,697,3,0,0,0,0,0,0,0,0,1],"830":[0,715,2,0,0,0,0,0,0,0,0,2],"845":[0,642,4,0,0,0,0,0,0,0,0,1],"900":[0,590,2,0,0,0,0,0,0,0,0,2],"915":[0,588,2,0,0,0,0,0,0,0,0,2],"930":[0,647,3,0,0,0,0,0,0,0,0,2],"945":[0,590,4,0,0,0,0,0,0,0,0,3],"1500":[0,594,1,0,0,0,0,0,0,0,0,3],"1515":[0,593,1,0,0,0,0,0,0,0,0,2],"1530":[0,613,1,0,0,0,0,0,0,0,0,3],"1545":[0,599,1,0,0,0,0,0,0,0,0,2],"1600":[0,634,3,0,0,0,0,0,0,0,0,3],"1615":[0,642,3,0,0,0,0,0,0,0,0,2],"1630":[0,665,4,0,0,0,0,0,0,0,0,2],"1645":[0,657,5,0,0,0,0,0,0,0,0,2],"1700":[0,670,6,0,0,0,0,0,0,0,0,3],"1715":[0,683,5,0,0,0,0,0,0,0,0,2],"1730":[0,647,3,0,0,0,0,0,0,0,0,3],"1745":[0,629,2,0,0,0,0,0,0,0,0,1],"1800":[0,597,4,0,0,0,0,0,0,0,0,4],"1815":[0,636,6,0,0,0,0,0,0,0,0,3],"1830":[0,655,2,0,0,0,0,0,0,0,0,6],"1845":[0,581,1,0,0,0,0,0,0,0,0,2]},"1: Weekday (Tu-Th)":{"600":[0,426,1,0,0,0,0,0,0,0,0,0],"615":[0,521,3,0,0,0,0,0,0,0,0,1],"630":[0,626,2,0,0,0,0,0,0,0,0,2],"645":[0,644,1,0,0,0,0,0,0,0,0,1],"700":[0,677,0,0,0,0,0,0,0,0,0,1],"715":[0,808,2,0,0,0,0,0,0,0,0,1],"730":[0,869,2,0,0,0,0,0,0,0,0,2],"745":[0,858,3,0,0,0,0,0,0,0,0,2],"800":[0,882,3,0,0,0,0,0,0,0,0,2],"815":[0,857,4,0,0,0,0,0,0,0,0,2],"830":[0,843,3,0,0,0,0,0,0,0,0,2],"845":[0,748,4,0,0,0,0,0,0,0,0,2],"900":[0,668,2,0,0,0,0,0,0,0,0,2],"915":[0,625,2,0,0,0,0,0,0,0,0,3],"930":[0,659,3,0,0,0,0,0,0,0,0,2],"945":[0,585,3,0,0,0,0,0,0,0,0,3],"1500":[0,549,2,0,0,0,0,0,0,0,0,3],"1515":[0,557,1,0,0,0,0,0,0,0,0,2],"1530":[0,561,2,0,0,0,0,0,0,0,0,3],"1545":[0,558,2,0,0,0,0,0,0,0,0,3],"1600":[0,590,4,0,0,0,0,0,0,0,0,4],"1615":[0,609,5,0,0,0,0,0,0,0,0,2],"1630":[0,611,5,0,0,0,0,0,0,0,0,3],"1645":[0,626,7,0,0,0,0,0,0,0,0,3],"1700":[0,632,7,0,0,0,0,0,0,0,0,3],"1715":[0,664,7,0,0,0,0,0,0,0,0,3],"1730":[0,618,4,0,0,0,0,0,0,0,0,3],"1745":[0,616,3,0,0,0,0,0,0,0,0,1],"1800":[0,569,7,0,0,0,0,0,0,0,0,6],"1815":[0,628,9,0,0,0,0,0,0,0,0,4],"1830":[0,645,3,0,0,0,0,0,0,0,0,9],"1845":[0,571,2,0,0,0,0,0,0,0,0,3]},"2: Weekend (Sa-Su)":{"600":[0,123,0,0,0,0,0,0,0,0,0,0],"615":[0,173,0,0,0,0,0,0,0,0,0,0],"630":[0,225,0,0,0,0,0,0,0,0,0,0],"645":[0,214,0,0,0,0,0,0,0,0,0,0],"700":[0,220,0,0,0,0,0,0,0,0,0,0],"715":[0,282,0,0,0,0,0,0,0,0,0,0],"730":[0,330,0,0,0,0,0,0,0,0,0,0],"745":[0,327,1,0,0,0,0,0,0,0,0,0],"800":[0,347,1,0,0,0,0,0,0,0,0,1],"815":[0,399,1,0,0,0,0,0,0,0,0,0],"830":[0,502,2,0,0,0,0,0,0,0,0,1],"845":[0,488,4,0,0,0,0,0,0,0,0,0],"900":[0,489,2,0,0,0,0,0,0,0,0,1],"915":[0,545,1,0,0,0,0,0,0,0,0,1],"930":[0,656,4,0,0,0,0,0,0,0,0,1],"945":[0,645,4,0,0,0,0,0,0,0,0,2],"1100":[0,705,4,0,0,0,0,0,0,0,0,7],"1115":[0,707,2,0,0,0,0,0,0,0,0,4],"1130":[0,767,1,0,0,0,0,0,0,0,0,1],"1145":[0,751,1,0,0,0,0,0,0,0,0,1],"1200":[0,775,1,0,0,0,0,0,0,0,0,6],"1215":[0,762,1,0,0,0,0,0,0,0,0,3],"1230":[0,819,1,0,0,0,0,0,0,0,0,2],"1245":[0,746,2,0,0,0,0,0,0,0,0,3],"1300":[0,745,1,0,0,0,0,0,0,0,0,2],"1500":[0,678,1,0,0,0,0,0,0,0,0,1],"1515":[0,667,1,0,0,0,0,0,0,0,0,2],"1530":[0,715,0,0,0,0,0,0,0,0,0,2],"1545":[0,674,1,0,0,0,0,0,0,0,0,1],"1600":[0,727,1,0,0,0,0,0,0,0,0,1],"1615":[0,707,1,0,0,0,0,0,0,0,0,1],"1630":[0,782,0,0,0,0,0,0,0,0,0,1],"1645":[0,736,0,0,0,0,0,0,0,0,0,1],"1700":[0,762,1,0,0,0,0,0,0,0,0,1],"1715":[0,723,0,0,0,0,0,0,0,0,0,1],"1730":[0,712,1,0,0,0,0,0,0,0,0,2],"1745":[0,659,1,0,0,0,0,0,0,0,0,1],"1800":[0,639,1,0,0,0,0,0,0,0,0,1],"1815":[0,656,0,0,0,0,0,0,0,0,0,0],"1830":[0,685,0,0,0,0,0,0,0,0,0,1],"1845":[0,607,1,0,0,0,0,0,0,0,0,1]}}}}}}</script>
+<script>
+(() => {
+'use strict';
+const $ = id => document.getElementById(id);
+const MOV = ['NBL','NBT','NBR','SBL','SBT','SBR','EBL','EBT','EBR','WBL','WBT','WBR'];
+const LEGS = ['N','E','S','W'];
+const LEG_NAME = {N:'North',E:'East',S:'South',W:'West'};
+const APPR = {N:'SB',S:'NB',W:'EB',E:'WB'};
+const TW = 200, TH = 190, THW = TW/2, THH = TH/2, LEGO = 17, JR = 16, TR = 9, ASP = 12;  // junction radius, terminal half-size, spacing of attach points
+const isNum = v => v !== null && v !== undefined && v !== '' && !isNaN(+v);
+const fmt = v => (v === null || v === undefined || isNaN(v)) ? '?' : Math.round(v).toLocaleString('en-US');
+const pct = d => (d === null || d === undefined || !isFinite(d)) ? '' : (d >= 0 ? '+' : '') + (d * 100).toFixed(1) + '%';
+const dcls = (d, S) => { if (d === null || d === undefined || !isFinite(d)) return ''; const a = Math.abs(d) * 100; return a <= (S.okPct ?? 5) ? 'ok' : a <= (S.warnPct ?? 10) ? 'warn' : 'bad'; };
+const uid = p => p + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+const toMin = t => { t = String(t).padStart(4, '0'); return +t.slice(0, 2) * 60 + +t.slice(2); };
+const fromMin = m => { m = ((m % 1440) + 1440) % 1440; return String(Math.floor(m / 60)) + String(m % 60).padStart(2, '0'); };
+const tLabel = t => { const m = toMin(t); const h = Math.floor(m / 60), mm = m % 60; return `${(h % 12) || 12}:${String(mm).padStart(2, '0')} ${h < 12 ? 'AM' : 'PM'}`; };
+
+let model, scId, sel = null, tool = 'select', fileHandle = null, dirty = false, undoStack = [], redoStack = [];
+let view = { x: 40, y: 40, k: 0.8 };
+let connectFrom = null, pending = null, C = null; // C = last compute()
+
+// ---------------------------------------------------------------- model helpers
+function normalize(m) {
+  m.meta ||= {}; m.settings ||= {}; m.sources ||= {}; m.nodes ||= []; m.links ||= []; m.scenarios ||= {};
+  const S = m.settings; S.baseYear ??= new Date().getFullYear(); S.growthPct ??= 0; S.okPct ??= 5; S.warnPct ??= 10;
+  if (!Object.keys(m.scenarios).length) m.scenarios.base = { name: 'Baseline', dayType: '', start: '1700', bins: 4, links: {}, tmc: {} };
+  for (const sc of Object.values(m.scenarios)) { sc.links ||= {}; sc.tmc ||= {}; sc.bins ||= 4; sc.start ||= '1700'; }
+  m.nodes.forEach(n => { n.x = +n.x || 0; n.y = +n.y || 0; n.type ||= 'junction'; });
+  return m;
+}
+const cur = () => model.scenarios[scId];
+const nodeById = id => model.nodes.find(n => n.id === id);
+const linkById = id => model.links.find(l => l.id === id);
+function nodeName(n) {
+  if (!n) return '?'; if (n.label) return n.label;
+  const i = model.links.find(l => l.to === n.id), o = model.links.find(l => l.from === n.id);
+  const nm = l => l ? (l.label || l.id) : '…';
+  return n.type === 'junction' ? `${nm(i)} → ${nm(o)}` : n.id;
+}
+function adjacency() {
+  const adj = {}; model.nodes.forEach(n => adj[n.id] = { in: [], out: [] });
+  model.links.forEach(l => { adj[l.from]?.out.push(l.id); adj[l.to]?.in.push(l.id); });
+  return adj;
+}
+function legSums(m, extras = []) {
+  const g = k => +m[k] || 0;
+  const s = {
+    in: { N: g('SBL') + g('SBT') + g('SBR'), S: g('NBL') + g('NBT') + g('NBR'), W: g('EBL') + g('EBT') + g('EBR'), E: g('WBL') + g('WBT') + g('WBR') },
+    out: { N: g('NBT') + g('EBL') + g('WBR'), S: g('SBT') + g('WBL') + g('EBR'), E: g('EBT') + g('NBR') + g('SBL'), W: g('WBT') + g('SBR') + g('NBL') }
+  };
+  // extra movements (U-turns, additional turn lanes, odd legs): each has an entry leg and an exit leg
+  for (const x of extras) { const v = g(x.key); if (s.in[x.from] !== undefined) s.in[x.from] += v; if (s.out[x.to] !== undefined) s.out[x.to] += v; }
+  return s;
+}
+const EXTRA_PRESETS = [
+  ['NB U-turn', 'S', 'S'], ['SB U-turn', 'N', 'N'], ['EB U-turn', 'W', 'W'], ['WB U-turn', 'E', 'E'],
+  ['NBL (2nd lane)', 'S', 'W'], ['NBR (2nd lane)', 'S', 'E'], ['SBL (2nd lane)', 'N', 'E'], ['SBR (2nd lane)', 'N', 'W'],
+  ['EBL (2nd lane)', 'W', 'N'], ['EBR (2nd lane)', 'W', 'S'], ['WBL (2nd lane)', 'E', 'S'], ['WBR (2nd lane)', 'E', 'N'],
+];
+function sourceMovements(b, sc) {
+  const s = model.sources[b.id]; const inter = s?.data?.[b.intersection]; if (!inter) return null;
+  const dt = b.dayType || sc.dayType; const start = b.start || sc.start; const n = +(b.bins || sc.bins || 4);
+  const byTime = inter[dt]; if (!byTime) return { m: null, found: 0, n, dt, start };
+  const m = {}; MOV.forEach(k => m[k] = 0); let found = 0; const t0 = toMin(start);
+  for (let i = 0; i < n; i++) { const row = byTime[fromMin(t0 + 15 * i)]; if (row) { found++; MOV.forEach((k, j) => m[k] += +row[j] || 0); } }
+  return { m: found ? m : null, found, n, dt, start };
+}
+function tmcInfo(nid) {
+  const sc = cur(); const t = sc.tmc[nid] || {}; const src = (t.source && t.source.id) ? sourceMovements(t.source, sc) : null;
+  const m = {}, ov = {};
+  for (const k of MOV) { const isOv = !!(t.overrides && t.overrides[k]); if (src && src.m && !isOv) m[k] = src.m[k]; else { m[k] = +((t.movements || {})[k]) || 0; ov[k] = isOv && !!(src && src.m); } }
+  const extras = nodeById(nid)?.extras || [];
+  for (const x of extras) { m[x.key] = +((t.movements || {})[x.key]) || 0; ov[x.key] = false; }
+  return { m, ov, src, bound: !!(t.source && t.source.id), extras };
+}
+function adjObs(o) {
+  const S = model.settings; const v = +o.value; if (!isNum(o.value)) return null;
+  if (o.growth === false || !S.growthPct) return v;
+  const y = o.date ? parseInt(String(o.date).slice(0, 4)) : NaN; if (isNaN(y)) return v;
+  return v * Math.pow(1 + S.growthPct / 100, S.baseYear - y);
+}
+// ---------------------------------------------------------------- solver
+function compute() {
+  const sc = cur(), S = model.settings, adj = adjacency();
+  const nodes = Object.fromEntries(model.nodes.map(n => [n.id, n]));
+  const tmc = {}; model.nodes.filter(n => n.type === 'tmc').forEach(n => { const i = tmcInfo(n.id); tmc[n.id] = { ...i, sums: legSums(i.m, i.extras) }; });
+  const val = {}, st = {}, from = {};
+  for (const l of model.links) {
+    const d = sc.links[l.id] || {}; const mode = d.mode || 'auto';
+    if (mode === 'lock' && isNum(d.balanced)) { val[l.id] = +d.balanced; st[l.id] = 'lock'; continue; }
+    if (mode === 'auto' && d.observed?.length) { const o = d.observed[d.primary || 0] || d.observed[0]; const a = o ? adjObs(o) : null; if (a !== null) { val[l.id] = a; st[l.id] = 'anchor'; continue; } }
+    const toN = nodes[l.to], frN = nodes[l.from];
+    if (toN?.type === 'tmc' && l.toLeg && tmc[toN.id]) { val[l.id] = tmc[toN.id].sums.in[l.toLeg]; st[l.id] = 'tmc'; from[l.id] = 'to'; continue; }
+    if (frN?.type === 'tmc' && l.fromLeg && tmc[frN.id]) { val[l.id] = tmc[frN.id].sums.out[l.fromLeg]; st[l.id] = 'tmc'; from[l.id] = 'from'; continue; }
+    st[l.id] = 'unknown';
+  }
+  // Conservation solver. Forward solves (unknown out-link) win over backward solves (unknown
+  // in-link), so counts propagate in the direction of travel and a conflict lands on the
+  // junction just upstream of the next count, as in the spreadsheet. Backward solves are taken
+  // first at pure aggregation nodes (all out-links end at terminals, e.g. a ramp split), then
+  // one at a time anywhere else.
+  // Directional junctions: a junction made of exactly two opposite-direction pairs (a two-way
+  // street passing through) balances each direction on its own, so an eastbound mismatch never
+  // shows up on the westbound links. Other junctions use one equation over all their links.
+  const groups = [];
+  for (const n of model.nodes) {
+    if (n.type !== 'junction') continue;
+    for (const [k, g] of junctionGroups(n, adj).entries()) if (g.in.length && g.out.length) groups.push({ id: n.id + '#' + k, nid: n.id, k, in: g.in, out: g.out });
+  }
+  const sumKnown = ids => ids.filter(id => st[id] !== 'unknown').reduce((a, id) => a + val[id], 0);
+  const solveAt = (g, u) => { val[u] = Math.max(0, g.in.includes(u) ? sumKnown(g.out) - sumKnown(g.in) : sumKnown(g.in) - sumKnown(g.out)); st[u] = 'derived'; };
+  const single = g => { const unk = [...g.in, ...g.out].filter(id => st[id] === 'unknown'); return unk.length === 1 ? unk[0] : null; };
+  const pureSink = g => g.out.every(id => nodes[linkById(id).to]?.type === 'terminal');
+  const junctions = groups;
+  let guard = 0;
+  while (guard++ < 2000) {
+    let changed = false;
+    for (let inner = 0; inner < 200; inner++) { let c2 = false; for (const g of junctions) { const u = single(g); if (u && g.out.includes(u)) { solveAt(g, u); c2 = true; } } if (!c2) break; changed = true; }
+    if (!changed) for (const g of junctions) { const u = single(g); if (u && g.in.includes(u) && pureSink(g)) { solveAt(g, u); changed = true; } }
+    if (!changed) for (const g of junctions) { const u = single(g); if (u && g.in.includes(u)) { solveAt(g, u); changed = true; break; } }
+    if (!changed) break;
+  }
+  // imbalance per directional group; imb[node] keeps the node total for quick checks
+  const gimb = {}, imb = {}, nodeGroups = {};
+  for (const g of groups) {
+    (nodeGroups[g.nid] ||= []).push(g);
+    if ([...g.in, ...g.out].some(id => st[id] === 'unknown')) continue;
+    g.sumIn = g.in.reduce((a, id) => a + val[id], 0); g.sumOut = g.out.reduce((a, id) => a + val[id], 0);
+    gimb[g.id] = g.sumIn - g.sumOut; imb[g.nid] = (imb[g.nid] || 0) + gimb[g.id];
+  }
+  const groupImb = (nid, lid, dir) => { const g = groups.find(x => x.nid === nid && x[dir].includes(lid)); return g ? gimb[g.id] : undefined; };
+  const chips = {};
+  for (const l of model.links) {
+    const d = sc.links[l.id] || {}; const v = val[l.id]; const c = chips[l.id] = [];
+    const df = ref => (v === undefined || !ref) ? null : (v - ref) / ref;
+    (d.observed || []).forEach((o, i) => { const a = adjObs(o); if (a === null) return; const y = o.date ? String(o.date).slice(0, 4) : '';
+      c.push({ kind: 'obs', label: `${o.source || 'count'}${y ? ' ' + y : ''}`, value: a, raw: +o.value, grown: Math.round(a) !== Math.round(+o.value), diff: df(a), used: st[l.id] === 'anchor' && i === (d.primary || 0) }); });
+    const toN = nodes[l.to], frN = nodes[l.from];
+    if (toN?.type === 'tmc' && l.toLeg && tmc[toN.id]) { const a = tmc[toN.id].sums.in[l.toLeg]; c.push({ kind: 'tmc', label: 'approach ↓', value: a, diff: df(a), used: st[l.id] === 'tmc' && from[l.id] === 'to' }); }
+    if (frN?.type === 'tmc' && l.fromLeg && tmc[frN.id]) { const a = tmc[frN.id].sums.out[l.fromLeg]; c.push({ kind: 'tmc', label: 'departure ↑', value: a, diff: df(a), used: st[l.id] === 'tmc' && from[l.id] === 'from' }); }
+    if ((st[l.id] === 'lock' || st[l.id] === 'anchor' || st[l.id] === 'tmc') && l.cls !== 'ramp') {
+      const iF = groupImb(l.from, l.id, 'out'), iT = groupImb(l.to, l.id, 'in');
+      if (iF !== undefined && Math.abs(iF) > 0.5) { const e = v + iF; c.push({ kind: 'flow', label: 'flow from upstream', value: e, diff: df(e) }); }
+      if (iT !== undefined && Math.abs(iT) > 0.5) { const e = v - iT; c.push({ kind: 'flow', label: 'flow from downstream', value: e, diff: df(e) }); }
+    }
+  }
+  return { val, st, imb, gimb, groups, nodeGroups, tmc, adj, chips, S };
+}
+function junctionGroups(n, adj) {
+  const ins = adj[n.id].in, outs = adj[n.id].out;
+  const pairs = ins.map(i => reverseOf(linkById(i))?.id);
+  const twoWay = ins.length === 2 && outs.length === 2 && pairs.every(r => r && outs.includes(r)) && pairs[0] !== pairs[1];
+  const split = n.directional === true ? twoWay : (n.directional !== false && twoWay);
+  if (!split) return [{ in: ins, out: outs }];
+  // in-link 0 continues to the out-link that is NOT its own reverse
+  const out0 = outs.find(o => o !== pairs[0]); const out1 = outs.find(o => o !== out0);
+  return [{ in: [ins[0]], out: [out0] }, { in: [ins[1]], out: [out1] }];
+}
+// ---------------------------------------------------------------- geometry
+function svgEl(tag, attrs = {}, children = []) {
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k, v] of Object.entries(attrs)) { if (v === null || v === undefined) continue; e.setAttribute(k, v); }
+  for (const c of children) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  return e;
+}
+const CW = ['N', 'E', 'S', 'W'];
+const GLYPH = { N: { L: '↘', T: '↓', R: '↙', U: 'U' }, S: { L: '↖', T: '↑', R: '↗', U: 'U' }, W: { L: '↗', T: '→', R: '↘', U: 'U' }, E: { L: '↙', T: '←', R: '↖', U: 'U' } };
+function turnType(from, to) { const i = CW.indexOf(from), j = CW.indexOf(to); if (i < 0 || j < 0) return 'X'; return ['U', 'L', 'T', 'R'][(j - i + 4) % 4]; }
+function legCells(n, leg) { // driver order U, L, T, R; extras follow their standard movement
+  const ex = (n.extras || []).filter(x => x.from === leg);
+  const byType = ty => ex.filter(x => turnType(x.from, x.to) === ty).map(x => ({ key: x.key, type: ty, extra: true, label: x.label }));
+  const std = ty => ({ key: APPR[leg] + ty, type: ty, extra: false });
+  const seq = [...byType('U'), std('L'), ...byType('L'), std('T'), ...byType('T'), std('R'), ...byType('R'), ...byType('X')];
+  return (leg === 'N' || leg === 'E') ? seq.reverse() : seq;   // driver's left is page-right for SB, page-down for WB
+}
+function tmcDims(n) {
+  const ns = Math.max(legCells(n, 'N').length, legCells(n, 'S').length), we = Math.max(legCells(n, 'W').length, legCells(n, 'E').length);
+  return { hw: Math.max(THW, Math.ceil((ns * 54 + 44) / 2)), hh: Math.max(THH, Math.ceil((we * 20 + 136) / 2)) };
+}
+function legAttach(n, leg, io) {
+  const o = LEGO; const { hw, hh } = tmcDims(n);
+  switch (leg) {
+    case 'N': return { x: n.x + (io === 'in' ? -o : o), y: n.y - hh };
+    case 'S': return { x: n.x + (io === 'in' ? o : -o), y: n.y + hh };
+    case 'W': return { x: n.x - hw, y: n.y + (io === 'in' ? o : -o) };
+    default:  return { x: n.x + hw, y: n.y + (io === 'in' ? -o : o) };
+  }
+}
+// Attach points on junctions and terminals: every link gets its own spot on the node edge, in
+// the direction it comes from. Links arriving from nearly the same direction (a two-way street,
+// a ramp alongside the mainline) are spread side by side, in-links on one side, out-links on the
+// other, so arrows never pile up on one point.
+let ATT = {};   // nodeId -> linkId -> {x, y}
+function farPoint(n, l) {
+  const other = l.from === n.id ? nodeById(l.to) : nodeById(l.from); if (!other) return null;
+  if (other.type === 'tmc') { const leg = l.from === n.id ? l.toLeg : l.fromLeg; if (leg) return legAttach(other, leg, l.from === n.id ? 'in' : 'out'); }
+  const via = l.via || []; if (via.length) { const p = l.from === n.id ? via[0] : via[via.length - 1]; return { x: +p[0], y: +p[1] }; }
+  return { x: other.x, y: other.y };
+}
+function buildAttach() {
+  ATT = {};
+  for (const n of model.nodes) {
+    if (n.type === 'tmc') continue;
+    const R = n.type === 'junction' ? JR : TR;
+    const items = [];
+    for (const l of model.links) {
+      if (l.from !== n.id && l.to !== n.id) continue; const f = farPoint(n, l); if (!f) continue;
+      const dx = f.x - n.x, dy = f.y - n.y, L = Math.hypot(dx, dy) || 1;
+      items.push({ l, ux: dx / L, uy: dy / L, ang: Math.atan2(dy, dx), out: l.from === n.id });
+    }
+    items.sort((p, q) => p.ang - q.ang);
+    // cluster links whose directions are within 35 degrees (circular)
+    const clusters = []; const TH = 35 * Math.PI / 180;
+    for (const it of items) { const c = clusters[clusters.length - 1]; if (c && it.ang - c[c.length - 1].ang <= TH) c.push(it); else clusters.push([it]); }
+    if (clusters.length > 1) { const first = clusters[0], last = clusters[clusters.length - 1]; if (first[0].ang + 2 * Math.PI - last[last.length - 1].ang <= TH) { clusters[0] = last.concat(first); clusters.pop(); } }
+    const m = ATT[n.id] = {};
+    for (const c of clusters) {
+      let sx = 0, sy = 0; for (const it of c) { sx += it.ux; sy += it.uy; } const L = Math.hypot(sx, sy) || 1; const ux = sx / L, uy = sy / L; const nx = -uy, ny = ux;
+      c.sort((p, q) => (p.out - q.out) || (p.ang - q.ang));   // in-links first (their right-hand side is -n), then out-links (+n)
+      c.forEach((it, i) => { const off = (i - (c.length - 1) / 2) * ASP; const rr = Math.sqrt(Math.max(4, R * R - off * off)); m[it.l.id] = { x: n.x + ux * rr + nx * off, y: n.y + uy * rr + ny * off }; });
+    }
+  }
+}
+function shorten(p, q, d) { const dx = q.x - p.x, dy = q.y - p.y, L = Math.hypot(dx, dy) || 1; return { x: p.x + dx / L * d, y: p.y + dy / L * d }; }
+function linkPoints(l) {
+  const a = nodeById(l.from), b = nodeById(l.to); if (!a || !b) return null;
+  const pts = [];
+  const aLeg = a.type === 'tmc' && l.fromLeg, bLeg = b.type === 'tmc' && l.toLeg;
+  const aAtt = ATT[a.id]?.[l.id], bAtt = ATT[b.id]?.[l.id];
+  pts.push(aLeg ? legAttach(a, l.fromLeg, 'out') : (aAtt || { x: a.x, y: a.y }));
+  (l.via || []).forEach(p => pts.push({ x: +p[0], y: +p[1] }));
+  pts.push(bLeg ? legAttach(b, l.toLeg, 'in') : (bAtt || { x: b.x, y: b.y }));
+  const n = pts.length - 1;
+  pts[0] = shorten(pts[0], pts[1], aLeg ? 0 : 2);
+  pts[n] = shorten(pts[n], pts[n - 1], bLeg ? 4 : 6);
+  return pts;
+}
+function pointAt(pts, t) {
+  const segs = []; let L = 0;
+  for (let i = 0; i < pts.length - 1; i++) { const d = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y); segs.push(d); L += d; }
+  let target = t * L;
+  for (let i = 0; i < segs.length; i++) {
+    if (target <= segs[i] || i === segs.length - 1) { const f = segs[i] ? Math.min(1, target / segs[i]) : 0; return { x: pts[i].x + (pts[i + 1].x - pts[i].x) * f, y: pts[i].y + (pts[i + 1].y - pts[i].y) * f }; }
+    target -= segs[i];
+  }
+  return pts[0];
+}
+const pathD = pts => pts.map((p, i) => (i ? 'L' : 'M') + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join('');
+const textW = (s, fs) => [...String(s)].length * fs * 0.58 + 10;
+const STNAME = { lock: 'locked', anchor: 'from count', tmc: 'from movements', derived: 'balanced', unknown: 'unknown' };
+
+// ---------------------------------------------------------------- render
+function setWorld() { $('world').setAttribute('transform', `translate(${view.x} ${view.y}) scale(${view.k})`); }
+let rafId = 0;
+function scheduleRender() { if (rafId) return; rafId = requestAnimationFrame(() => { rafId = 0; render(); }); }
+function render() {
+  C = compute(); buildAttach();
+  setWorld();
+  const gL = $('gLinks'), gN = $('gNodes'), gLb = $('gLabels');
+  gL.innerHTML = ''; gN.innerHTML = ''; gLb.innerHTML = '';
+  const showChips = $('ckChips').checked, showNames = $('ckNames').checked;
+  for (const l of model.links) {
+    const pts = linkPoints(l); if (!pts) continue;
+    const d = pathD(pts); const cls = l.cls || 'street';
+    const isSel = sel?.type === 'link' && sel.id === l.id;
+    if (isSel) gL.appendChild(svgEl('path', { d, class: 'lk sel' }));
+    gL.appendChild(svgEl('path', { d, class: 'lk ' + cls, 'marker-end': `url(#arr-${cls})` }));
+    gL.appendChild(svgEl('path', { d, class: 'lk hit', 'data-link': l.id }));
+    const v = C.val[l.id], st = C.st[l.id];
+    const vt = (st === 'lock' ? '🔒 ' : '') + fmt(v);
+    const w = Math.max(40, textW(vt, 13));
+    // opposite-direction pairs: each label goes to the right-hand side of its own line, a little before mid-link
+    const pair = reverseOf(l);
+    const t = isNum(l.labelT) ? +l.labelT : (pair ? 0.3 : 0.5);
+    const p = pointAt(pts, t); let side = 0;   // side: +1 label sits right of the line (grow rightwards), -1 left
+    if (pair && !isNum(l.labelDx) && !isNum(l.labelDy)) {
+      const q = pointAt(pts, Math.min(1, t + 0.04)); const dx = q.x - p.x, dy = q.y - p.y, L = Math.hypot(dx, dy) || 1;
+      const nx = -dy / L, ny = dx / L;
+      const off = Math.abs(dx / L) > 0.7 ? 22 : w / 2 + 12;   // horizontal link: push label down/up; otherwise sideways
+      p.x += nx * off; p.y += ny * off; side = nx > 0.3 ? 1 : nx < -0.3 ? -1 : 0;
+    }
+    p.x += +l.labelDx || 0; p.y += +l.labelDy || 0;
+    const g = svgEl('g', { class: 'lbl ' + st, transform: `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`, 'data-link': l.id });
+    if (showNames && l.label) g.appendChild(svgEl('text', { class: 'name', x: side > 0 ? -w / 2 : side < 0 ? w / 2 : 0, y: -14, 'text-anchor': side > 0 ? 'start' : side < 0 ? 'end' : 'middle' }, [l.label]));
+    g.appendChild(svgEl('rect', { class: 'main', x: -w / 2, y: -10, width: w, height: 20, rx: 4 }));
+    g.appendChild(svgEl('text', { class: 'v', x: 0, y: 4.5, 'text-anchor': 'middle' }, [vt]));
+    if (showChips) {
+      const up = !!l.chipsUp; let y = up ? -25 - (showNames && l.label ? 12 : 0) : 14;
+      for (const c of C.chips[l.id]) {
+        if (c.used) continue;
+        const s = `${c.label} ${fmt(c.value)}`, ds = pct(c.diff); const cw = textW(s + '  ' + ds, 9);
+        const cg = svgEl('g', { class: 'chipg ' + c.kind + ' ' + dcls(c.diff, C.S), transform: `translate(0 ${y})` });
+        const cx0 = side > 0 ? -w / 2 : side < 0 ? w / 2 - cw : -cw / 2;
+        cg.appendChild(svgEl('rect', { x: cx0, y: 0, width: cw, height: 13, rx: 3 }));
+        cg.appendChild(svgEl('text', { x: cx0 + 4, y: 9.5 }, [s]));
+        cg.appendChild(svgEl('text', { class: 'd', x: cx0 + cw - 4, y: 9.5, 'text-anchor': 'end' }, [ds]));
+        g.appendChild(cg); y += up ? -15 : 15;
+      }
+    }
+    gLb.appendChild(g);
+  }
+  for (const n of model.nodes) gN.appendChild(renderNode(n));
+  renderGhost();
+  renderStatus();
+}
+function renderNode(n) {
+  const selected = sel?.type === 'node' && sel.id === n.id;
+  const g = svgEl('g', { class: 'nd ' + n.type + (selected ? ' sel' : '') + (connectFrom?.id === n.id ? ' sel' : ''), 'data-node': n.id, transform: `translate(${n.x} ${n.y})` });
+  if (n.type === 'junction') {
+    const ext = JR;
+    g.appendChild(svgEl('circle', { r: JR }));
+    if (n.label) g.appendChild(svgEl('text', { class: 'nl', x: ext + 5, y: 4 }, [n.label]));
+    const gs = (C.nodeGroups[n.id] || []).filter(x => C.gimb[x.id] !== undefined && Math.abs(C.gimb[x.id]) > 0.5);
+    if (gs.length > 1) g.appendChild(svgEl('circle', { r: JR - 5, fill: 'none', stroke: 'var(--text2)', 'stroke-width': 1, 'stroke-dasharray': '2 2' }));
+    gs.forEach((grp, k) => {
+      const im = C.gimb[grp.id]; const rel = Math.abs(im) / Math.max(1, grp.sumIn) * 100;
+      const dirName = gs.length > 1 || (C.nodeGroups[n.id] || []).length > 1 ? ((linkById(grp.in[0])?.label || '') + ' → ' + (linkById(grp.out[0])?.label || '')) : '';
+      const s = 'Δ ' + (im > 0 ? '+' : '') + fmt(im); const w = textW(s, 9.5);
+      const b = svgEl('g', { class: 'imb ' + (rel <= C.S.warnPct ? 'warn' : ''), transform: `translate(${ext + 2} ${-ext - 10 - k * 17})` });
+      b.appendChild(svgEl('rect', { x: 0, y: 0, width: w, height: 14, rx: 7 }));
+      b.appendChild(svgEl('text', { x: w / 2, y: 10.5, 'text-anchor': 'middle' }, [s]));
+      b.appendChild(svgEl('title', {}, [`${dirName ? dirName + ': ' : ''}In − Out = ${fmt(im)} (${rel.toFixed(1)}% of inflow)`]));
+      g.appendChild(b);
+    });
+  } else if (n.type === 'terminal') {
+    g.appendChild(svgEl('rect', { class: 'term', x: -TR, y: -TR, width: 2 * TR, height: 2 * TR, rx: 3 }));
+    if (n.label) g.appendChild(svgEl('text', { class: 'nl', x: 0, y: TR + 14, 'text-anchor': 'middle' }, [n.label]));
+  } else renderTmc(g, n);
+  return g;
+}
+function legLinks(nid, leg) {
+  return { in: model.links.find(l => l.to === nid && l.toLeg === leg), out: model.links.find(l => l.from === nid && l.fromLeg === leg) };
+}
+function renderTmc(g, n) {
+  const info = C.tmc[n.id]; const m = info.m, ov = info.ov, s = info.sums; const { hw, hh } = tmcDims(n);
+  g.appendChild(svgEl('rect', { class: 'box', x: -hw, y: -hh, width: 2 * hw, height: 2 * hh }));
+  g.appendChild(svgEl('text', { class: 'title', x: 0, y: -hh + 23, 'text-anchor': 'middle' }, [(n.label || n.id).slice(0, Math.floor(hw / 3))]));
+  const cell = (c, leg, x, y, anchor, small) => {
+    const bw = small ? 30 : 38, bh = 15, gw = 11, W = gw + bw;
+    const left = anchor === 'middle' ? x - W / 2 : anchor === 'start' ? x : x - W;
+    const cg = svgEl('g', { class: 'mvcell' + (ov[c.key] ? ' ov' : '') + (c.extra ? ' extra' : ''), 'data-mv': c.key, 'data-node': n.id });
+    cg.appendChild(svgEl('text', { class: 'glyph', x: left + gw / 2, y, 'text-anchor': 'middle' }, [GLYPH[leg][c.type] || '·']));
+    cg.appendChild(svgEl('rect', { class: 'mvbox', x: left + gw, y: y - bh + 4, width: bw, height: bh, rx: 3 }));
+    cg.appendChild(svgEl('text', { class: 'mv', x: left + gw + bw / 2, y, 'text-anchor': 'middle', style: small ? 'font-size:9px' : null }, [fmt(m[c.key])]));
+    cg.appendChild(svgEl('title', {}, [(c.extra ? `${c.label} (extra movement)` : c.key) + ' — click to edit']));
+    g.appendChild(cg);
+  };
+  const sp = k => Math.min(54, (2 * hw - 30) / Math.max(k, 1));
+  const rowN = legCells(n, 'N'); rowN.forEach((c, i) => cell(c, 'N', (i - (rowN.length - 1) / 2) * sp(rowN.length), -hh + 49, 'middle', rowN.length > 4));
+  const rowS = legCells(n, 'S'); rowS.forEach((c, i) => cell(c, 'S', (i - (rowS.length - 1) / 2) * sp(rowS.length), hh - 16, 'middle', rowS.length > 4));
+  const colW = legCells(n, 'W'); colW.forEach((c, i) => cell(c, 'W', -hw + 16, (i - (colW.length - 1) / 2) * 20 + 6, 'start', false));
+  const colE = legCells(n, 'E'); colE.forEach((c, i) => cell(c, 'E', hw - 16, (i - (colE.length - 1) / 2) * 20 + 6, 'end', false));
+  const t = cur().tmc[n.id] || {};
+  let l1 = info.bound ? `${model.sources[t.source.id]?.name || t.source.id} · ${t.source.intersection}` : 'manual movements';
+  let l2 = info.src ? `${(info.src.dt || '').replace(/^\d+:\s*/, '')} · ${tLabel(info.src.start)} ×${info.src.n} (${info.src.found}/${info.src.n})` : (info.bound ? 'source not found' : '');
+  g.appendChild(svgEl('text', { class: 'src', x: 0, y: -hh + 62, 'text-anchor': 'middle' }, [l1.slice(0, Math.floor(hw / 4.5))]));
+  g.appendChild(svgEl('text', { class: 'src', x: 0, y: -hh + 72, 'text-anchor': 'middle' }, [l2.slice(0, Math.floor(hw / 4.2))]));
+  const sumTxt = (leg) => { const ll = legLinks(n.id, leg); if (!ll.in && !ll.out && !s.in[leg] && !s.out[leg]) return null; return `in ${fmt(s.in[leg])} · out ${fmt(s.out[leg])}`; };
+  const tN = sumTxt('N'); if (tN) g.appendChild(svgEl('text', { class: 'sum', x: 0, y: -hh + 35, 'text-anchor': 'middle' }, [tN]));
+  const tS = sumTxt('S'); if (tS) g.appendChild(svgEl('text', { class: 'sum', x: 0, y: hh - 29, 'text-anchor': 'middle' }, [tS]));
+  const yW = (colW.length - 1) / 2 * 20 + 6, yE = (colE.length - 1) / 2 * 20 + 6;
+  const tW = sumTxt('W'); if (tW) { g.appendChild(svgEl('text', { class: 'sum', x: -hw + 16, y: yW + 20, 'text-anchor': 'start' }, ['in ' + fmt(s.in.W)])); g.appendChild(svgEl('text', { class: 'sum', x: -hw + 16, y: yW + 32, 'text-anchor': 'start' }, ['out ' + fmt(s.out.W)])); }
+  const tE = sumTxt('E'); if (tE) { g.appendChild(svgEl('text', { class: 'sum', x: hw - 16, y: yE + 20, 'text-anchor': 'end' }, ['in ' + fmt(s.in.E)])); g.appendChild(svgEl('text', { class: 'sum', x: hw - 16, y: yE + 32, 'text-anchor': 'end' }, ['out ' + fmt(s.out.E)])); }
+  // connection ports: one in and one out slot per leg, drawn where links attach
+  const DIRV = { N: [0, 1], S: [0, -1], W: [1, 0], E: [-1, 0] };   // inward direction per leg
+  for (const leg of LEGS) for (const io of ['in', 'out']) {
+    const a = legAttach(n, leg, io); const ll = legLinks(n.id, leg)[io]; const cx = a.x - n.x, cy = a.y - n.y;
+    const pg = svgEl('g', { class: 'port ' + io + (ll ? ' used' : ' free'), 'data-port': leg + ':' + io, 'data-node': n.id });
+    pg.appendChild(svgEl('circle', { cx, cy, r: 9 }));
+    const [dx, dy] = DIRV[leg]; const s = io === 'in' ? 1 : -1; const px = -dy, py = dx;   // triangle points inward for in, outward for out
+    pg.appendChild(svgEl('path', { class: 'tri', d: `M${cx + dx * s * 4.5} ${cy + dy * s * 4.5}L${cx - dx * s * 3 + px * 4} ${cy - dy * s * 3 + py * 4}L${cx - dx * s * 3 - px * 4} ${cy - dy * s * 3 - py * 4}z` }));
+    pg.appendChild(svgEl('title', {}, [`${LEG_NAME[leg]} leg · ${io === 'in' ? 'IN (' + APPR[leg] + ' approach arrives here)' : 'OUT (departure leaves here)'}${ll ? ' · ' + (ll.label || ll.id) : ' · free — click in Connect mode'}`]));
+    g.appendChild(pg);
+  }
+}
+let ghostPt = null;
+function renderGhost() {
+  const g = $('gGhost'); g.innerHTML = '';
+  if (tool === 'connect' && connectFrom && ghostPt) { const a = nodeById(connectFrom.id); const s = (a && a.type === 'tmc' && connectFrom.leg) ? legAttach(a, connectFrom.leg, connectFrom.io) : a; if (a) g.appendChild(svgEl('line', { class: 'ghost', x1: s.x, y1: s.y, x2: ghostPt.x, y2: ghostPt.y })); }
+}
+function renderStatus() {
+  const unknown = model.links.filter(l => C.st[l.id] === 'unknown').length;
+  const off = Object.values(C.gimb).filter(v => Math.abs(v) > 0.5).length;
+  const sc = cur();
+  $('status').textContent = `${sc.name || scId} · ${model.nodes.length} nodes · ${model.links.length} links · ${unknown} unknown · ${off} junctions out of balance · zoom ${Math.round(view.k * 100)}%${dirty ? ' · unsaved' : ''}`;
+}
+function fit() {
+  if (!model.nodes.length) return;
+  const xs = model.nodes.map(n => n.x), ys = model.nodes.map(n => n.y);
+  const minX = Math.min(...xs) - 180, maxX = Math.max(...xs) + 180, minY = Math.min(...ys) - 140, maxY = Math.max(...ys) + 160;
+  const r = $('canvas').getBoundingClientRect();
+  view.k = Math.min(r.width / (maxX - minX), r.height / (maxY - minY), 1.5);
+  view.x = (r.width - (maxX + minX) * view.k) / 2; view.y = (r.height - (maxY + minY) * view.k) / 2;
+  render();
+}
+// ---------------------------------------------------------------- canvas interaction
+const svg = $('canvas');
+const toWorld = ev => { const r = svg.getBoundingClientRect(); return { x: (ev.clientX - r.left - view.x) / view.k, y: (ev.clientY - r.top - view.y) / view.k }; };
+let drag = null;
+svg.addEventListener('pointerdown', ev => {
+  if (ev.button !== 0) return;
+  const nodeEl = ev.target.closest('[data-node]'), linkEl = ev.target.closest('[data-link]');
+  const w = toWorld(ev);
+  if (tool.startsWith('add-')) { addNodeAt(tool.slice(4), w); return; }
+  if (tool === 'connect') { if (nodeEl) { const pe = ev.target.closest('[data-port]'); const [leg, io] = pe ? pe.dataset.port.split(':') : []; connectClick(nodeEl.dataset.node, ev.shiftKey, pe ? { leg, io } : null); } return; }
+  const mvEl = ev.target.closest('[data-mv]');
+  if (mvEl) { ev.preventDefault(); openMvEditor(mvEl); return; }
+  if (nodeEl) { const n = nodeById(nodeEl.dataset.node); drag = { kind: 'node', n, ox: w.x - n.x, oy: w.y - n.y, sx: ev.clientX, sy: ev.clientY, moved: false }; }
+  else if (linkEl) { select({ type: 'link', id: linkEl.dataset.link }); return; }
+  else drag = { kind: 'pan', sx: ev.clientX, sy: ev.clientY, vx: view.x, vy: view.y, moved: false };
+  svg.setPointerCapture(ev.pointerId);
+});
+svg.addEventListener('pointermove', ev => {
+  if (tool === 'connect' && connectFrom) { ghostPt = toWorld(ev); renderGhost(); }
+  if (!drag) return;
+  const dx = ev.clientX - drag.sx, dy = ev.clientY - drag.sy;
+  if (!drag.moved && Math.hypot(dx, dy) < 4) return;
+  if (!drag.moved) { drag.moved = true; if (drag.kind === 'node') snapshot(); }
+  if (drag.kind === 'pan') { view.x = drag.vx + dx; view.y = drag.vy + dy; setWorld(); }
+  else { const w = toWorld(ev); drag.n.x = Math.round(w.x - drag.ox); drag.n.y = Math.round(w.y - drag.oy); scheduleRender(); }
+});
+svg.addEventListener('pointerup', () => {
+  if (!drag) return;
+  if (drag.kind === 'node') { if (!drag.moved) select({ type: 'node', id: drag.n.id }); else { markDirty(); render(); } }
+  else if (!drag.moved) select(null);
+  drag = null;
+});
+// click a movement box inside an intersection to type a new value in place
+function openMvEditor(mvEl) {
+  if (document.querySelector('#wrap input.mvedit')) return;
+  const nid = mvEl.dataset.node, key = mvEl.dataset.mv; const info = C.tmc[nid]; if (!info) return;
+  const r = (mvEl.querySelector('rect') || mvEl).getBoundingClientRect(), wr = $('wrap').getBoundingClientRect();
+  const inp = el('input', { type: 'number', min: 0, class: 'mvedit', value: Math.round(info.m[key] || 0), style: `position:absolute;left:${r.left - wr.left - 2}px;top:${r.top - wr.top - 3}px;width:${Math.max(56, r.width + 8)}px;height:${Math.max(20, r.height + 6)}px;font-size:${Math.max(11, 11 * view.k)}px;padding:0 3px;z-index:6;border:2px solid var(--accent);border-radius:4px;background:var(--surface);color:var(--text)` });
+  let done = false;
+  const finish = (save) => {
+    if (done) return; done = true; inp.remove();
+    if (!save) return;
+    const v = +inp.value; if (isNaN(v)) return;
+    snapshot(); const t = cur().tmc[nid] ||= { movements: {} }; t.movements ||= {}; t.movements[key] = Math.max(0, v);
+    if (info.bound && MOV.includes(key)) { t.overrides ||= {}; t.overrides[key] = true; }
+    commit();
+  };
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === 'Tab') {
+      e.preventDefault(); const nextKey = e.key === 'Tab' ? nextMvCell(mvEl, e.shiftKey) : null; finish(true);
+      if (nextKey) setTimeout(() => { const e2 = document.querySelector(`[data-node="${nid}"][data-mv="${nextKey}"]`); if (e2) openMvEditor(e2); }, 0);
+    } else if (e.key === 'Escape') finish(false);
+    e.stopPropagation();
+  });
+  inp.addEventListener('blur', () => finish(true));
+  $('wrap').appendChild(inp); inp.focus(); inp.select();
+}
+function nextMvCell(mvEl, back) {   // Tab moves through the cells of the same box in drawing order
+  const nid = mvEl.dataset.node, key = mvEl.dataset.mv;
+  const cells = [...document.querySelectorAll(`[data-node="${nid}"][data-mv]`)]; const i = cells.findIndex(c => c.dataset.mv === key);
+  const j = (i + (back ? -1 : 1) + cells.length) % cells.length; const n = cells[j]; return n && n.dataset.mv;
+}
+svg.addEventListener('wheel', ev => {
+  ev.preventDefault();
+  const r = svg.getBoundingClientRect(); const mx = ev.clientX - r.left, my = ev.clientY - r.top;
+  const k2 = Math.min(4, Math.max(0.12, view.k * Math.exp(-ev.deltaY * 0.0012)));
+  view.x = mx - (mx - view.x) * k2 / view.k; view.y = my - (my - view.y) * k2 / view.k; view.k = k2;
+  setWorld(); renderStatus();
+}, { passive: false });
+
+// ---------------------------------------------------------------- DOM helpers & state changes
+function el(tag, attrs = {}, ...children) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'on') { for (const [ev, fn] of Object.entries(v)) e.addEventListener(ev, fn); }
+    else if (k === 'class') e.className = v;
+    else if (k === 'checked' || k === 'disabled' || k === 'selected') { if (v) e.setAttribute(k, ''); }
+    else if (v !== null && v !== undefined) e.setAttribute(k, v);
+  }
+  for (const c of children.flat()) if (c !== null && c !== undefined && c !== false) e.appendChild(typeof c === 'string' || typeof c === 'number' ? document.createTextNode(c) : c);
+  return e;
+}
+const row = (label, ...ctrl) => el('div', { class: 'row' }, el('label', {}, label), ...ctrl);
+function selectEl(options, value, onchange) {
+  const s = el('select', { on: { change: () => onchange(s.value) } });
+  for (const [v, t] of options) s.append(el('option', { value: v, selected: String(v) === String(value) }, t));
+  return s;
+}
+function select(s) { sel = s; connectFrom = null; pending = null; svg.classList.remove('connecting'); render(); renderPanel(); }
+function snapshot() { undoStack.push(JSON.stringify({ model, scId })); if (undoStack.length > 100) undoStack.shift(); redoStack = []; }
+function markDirty() {
+  dirty = true; document.title = '• Volume Balance';
+  try { localStorage.setItem('vb_autosave', JSON.stringify({ time: new Date().toLocaleString(), model, scId })); } catch (e) { }
+}
+function commit() { markDirty(); render(); renderPanel(); }
+function undo() {
+  if (!undoStack.length) return;
+  redoStack.push(JSON.stringify({ model, scId }));
+  const s = JSON.parse(undoStack.pop()); model = normalize(s.model); scId = s.scId; sel = null; pending = null;
+  markDirty(); refreshScenarioSelect(); render(); renderPanel();
+}
+function redo() {
+  if (!redoStack.length) return;
+  undoStack.push(JSON.stringify({ model, scId }));
+  const s = JSON.parse(redoStack.pop()); model = normalize(s.model); scId = s.scId; sel = null;
+  markDirty(); refreshScenarioSelect(); render(); renderPanel();
+}
+function setTool(t) {
+  tool = t; connectFrom = null; pending = null; ghostPt = null; svg.classList.remove('connecting');
+  document.querySelectorAll('.tool').forEach(b => b.classList.toggle('on', b.dataset.tool === t));
+  svg.classList.toggle('tool', t !== 'select');
+  render(); renderPanel();
+}
+function addNodeAt(kind, w) {
+  snapshot();
+  const n = { id: uid(kind === 'tmc' ? 'x' : kind === 'terminal' ? 't' : 'j'), type: kind, label: kind === 'tmc' ? 'New intersection' : kind === 'terminal' ? 'External' : '', x: Math.round(w.x), y: Math.round(w.y) };
+  model.nodes.push(n);
+  if (kind === 'tmc') { const t = cur().tmc[n.id] = { movements: {} }; MOV.forEach(k => t.movements[k] = 0); }
+  // the tool stays active (place several nodes in a row); Esc returns to Select
+  sel = { type: 'node', id: n.id }; commit();
+}
+function connectClick(nid, withReverse = false, port = null) {
+  // Clicking a port fixes both the leg and the direction: an OUT port is where a link starts, an
+  // IN port where it ends, whichever you click first. Clicking a box body still asks for the leg.
+  const here = { id: nid, leg: port?.leg, io: port?.io };
+  if (port && legLinks(nid, port.leg)[port.io]) { banner(`That ${port.io} port already has a link.`, [], 4000); return; }
+  if (!connectFrom) { connectFrom = here; svg.classList.add('connecting'); render(); renderPanel(); return; }
+  if (connectFrom.id === nid && (!port || (connectFrom.leg === port.leg && connectFrom.io === port.io))) { connectFrom = null; svg.classList.remove('connecting'); render(); renderPanel(); return; }
+  let src = connectFrom, dst = here;
+  if (src.io === 'in' || dst.io === 'out') [src, dst] = [dst, src];
+  if (src.io === 'in' || dst.io === 'out') { banner('Connect an OUT port to an IN port (or to a junction / terminal).', [], 5000); return; }
+  const a = nodeById(src.id), b = nodeById(dst.id);
+  const p = { from: a.id, to: b.id, reverse: withReverse, cls: (a.type === 'tmc' || b.type === 'tmc') ? 'street' : (a.type === 'terminal' || b.type === 'terminal' ? 'ramp' : 'interstate') };
+  if (a.type === 'tmc') p.fromLeg = src.leg || ''; if (b.type === 'tmc') p.toLeg = dst.leg || '';
+  if ((a.type === 'tmc' && !p.fromLeg) || (b.type === 'tmc' && !p.toLeg)) { pending = p; connectFrom = null; svg.classList.remove('connecting'); render(); renderPanel(); return; }
+  createLink(p, withReverse);
+}
+function reverseOf(l) { return model.links.find(r => r.from === l.to && r.to === l.from && (r.fromLeg || '') === (l.toLeg || '') && (r.toLeg || '') === (l.fromLeg || '')); }
+function makeReverse(l) {
+  if (reverseOf(l)) return null;
+  const r = { id: uid('l'), from: l.to, to: l.from, cls: l.cls || 'street' };
+  if (l.toLeg) { if (legLinks(l.to, l.toLeg).out) return null; r.fromLeg = l.toLeg; }
+  if (l.fromLeg) { if (legLinks(l.from, l.fromLeg).in) return null; r.toLeg = l.fromLeg; }
+  if (l.label) r.label = l.label + ' (reverse)';
+  if (isNum(l.labelT)) r.labelT = 1 - l.labelT;
+  model.links.push(r); return r;
+}
+function createLink(p, withReverse = false) {
+  snapshot();
+  const l = { id: uid('l'), from: p.from, to: p.to, cls: p.cls || 'street' };
+  if (p.fromLeg) l.fromLeg = p.fromLeg; if (p.toLeg) l.toLeg = p.toLeg;
+  model.links.push(l);
+  if (withReverse || p.reverse) { const r = makeReverse(l); if (!r) banner('Opposite link not created: that leg slot is already used.', [], 5000); }
+  pending = null; connectFrom = null; svg.classList.remove('connecting'); sel = { type: 'link', id: l.id }; commit();
+}
+function freeLegs(nid, io) { return LEGS.filter(L => !legLinks(nid, L)[io]); }
+function deleteSel() {
+  if (!sel) return;
+  if (sel.type === 'link') { snapshot(); model.links = model.links.filter(l => l.id !== sel.id); for (const sc of Object.values(model.scenarios)) delete sc.links[sel.id]; sel = null; commit(); return; }
+  const n = nodeById(sel.id); if (!n) return;
+  const linked = model.links.filter(l => l.from === n.id || l.to === n.id);
+  if ((n.type === 'tmc' || linked.length) && !confirm(`Delete "${n.label || n.id}" and its ${linked.length} link(s)?`)) return;
+  snapshot();
+  model.nodes = model.nodes.filter(x => x.id !== n.id);
+  model.links = model.links.filter(l => l.from !== n.id && l.to !== n.id);
+  for (const sc of Object.values(model.scenarios)) { delete sc.tmc[n.id]; linked.forEach(l => delete sc.links[l.id]); }
+  sel = null; commit();
+}
+// ---------------------------------------------------------------- side panel
+function renderPanel() {
+  const P = $('panel'); P.innerHTML = '';
+  if (pending) return pendingPanel(P);
+  if (tool === 'connect') P.append(el('div', { class: 'muted', style: 'margin-bottom:8px' }, connectFrom ? `From "${nodeById(connectFrom.id)?.label || connectFrom.id}${connectFrom.leg ? ' · ' + LEG_NAME[connectFrom.leg] + ' ' + connectFrom.io.toUpperCase() + ' port' : ''}" — now click the other end: a port on a box, or a junction / terminal (Shift+click also creates the opposite direction).` : 'Connect: click a port on an intersection box (OUT to start a link, IN to end one) or a junction / terminal, then the other end. Shift+click the second end to create both directions. Esc to stop.'));
+  if (tool.startsWith('add-')) P.append(el('div', { class: 'muted', style: 'margin-bottom:8px' }, `Placing ${tool.slice(4)}s: click the canvas for each one. Esc returns to Select.`));
+  const back = () => P.append(el('div', { class: 'row', style: 'margin:0 0 8px' }, el('button', { class: 'small', title: 'Back to overview (Esc)', on: { click: () => select(null) } }, '← Back to overview')));
+  if (sel?.type === 'link') { const l = linkById(sel.id); if (l) { back(); return linkPanel(P, l); } }
+  if (sel?.type === 'node') { const n = nodeById(sel.id); if (n) { back(); return n.type === 'tmc' ? tmcPanel(P, n) : nodePanel(P, n); } }
+  overviewPanel(P);
+}
+function overviewPanel(P) {
+  const sc = cur();
+  P.append(el('h2', {}, model.meta?.name || 'Network'), el('div', { class: 'muted' }, model.meta?.description || ''));
+  P.append(el('h3', {}, 'Scenario'));
+  P.append(el('div', {}, el('b', {}, sc.name || scId), ` · ${sc.dayType || 'no day type'} · ${tLabel(sc.start)} × ${sc.bins} bins`));
+  P.append(el('div', { class: 'muted' }, `Base year ${model.settings.baseYear}, growth ${model.settings.growthPct}%/yr, thresholds ±${model.settings.okPct}% / ±${model.settings.warnPct}%`));
+  const issues = [];
+  for (const l of model.links) if (C.st[l.id] === 'unknown') issues.push(['link', l.id, `Unknown: ${l.label || l.id}`, 'bad']);
+  for (const grp of C.groups) { const im = C.gimb[grp.id]; if (im === undefined || Math.abs(im) <= 0.5) continue; const n = nodeById(grp.nid); const rel = Math.abs(im) / Math.max(1, grp.sumIn) * 100; const multi = (C.nodeGroups[grp.nid] || []).length > 1; const nm = multi ? `${linkById(grp.in[0])?.label || grp.in[0]} → ${linkById(grp.out[0])?.label || grp.out[0]}` : nodeName(n); issues.push(['node', grp.nid, `Junction ${nm}: Δ ${im > 0 ? '+' : ''}${fmt(im)} (${rel.toFixed(1)}%)`, rel <= model.settings.okPct ? 'ok' : rel <= model.settings.warnPct ? 'warn' : 'bad']); }
+  for (const l of model.links) for (const c of C.chips[l.id]) { if (c.used || c.diff === null) continue; const k = dcls(c.diff, C.S); if (k === 'bad') issues.push(['link', l.id, `${l.label || l.id}: ${c.label} ${fmt(c.value)} vs ${fmt(C.val[l.id])} (${pct(c.diff)})`, 'bad']); }
+  P.append(el('h3', {}, `Issues (${issues.length})`));
+  if (!issues.length) P.append(el('div', { class: 'muted' }, 'Everything balances within thresholds.'));
+  const ul = el('div', { class: 'chipl' });
+  for (const [t, id, txt, k] of issues.slice(0, 60)) ul.append(el('button', { class: 'chip d-' + k, style: 'text-align:left;cursor:pointer', on: { click: () => select({ type: t, id }) } }, txt));
+  P.append(ul);
+  P.append(el('h3', {}, 'Sources'));
+  for (const [id, s] of Object.entries(model.sources)) P.append(el('div', {}, el('b', {}, s.name || id), el('span', { class: 'muted' }, ` · ${s.kind || ''} · ${Object.keys(s.data || {}).length} intersections · ${s.period || ''}`)));
+  P.append(el('div', { class: 'muted', style: 'margin-top:14px' }, 'Click a link or node to edit it. Help explains the rules.'));
+}
+function pendingPanel(P) {
+  const a = nodeById(pending.from), b = nodeById(pending.to);
+  P.append(el('h2', {}, 'New link'), el('div', { class: 'muted' }, `${a.label || a.id} → ${b.label || b.id}`));
+  if (a.type === 'tmc') P.append(row('Leaves leg', selectEl([['', '— choose —'], ...freeLegs(a.id, 'out').map(L => [L, LEG_NAME[L] + ' (out)'])], pending.fromLeg, v => pending.fromLeg = v)));
+  if (b.type === 'tmc') P.append(row('Enters leg', selectEl([['', '— choose —'], ...freeLegs(b.id, 'in').map(L => [L, LEG_NAME[L] + ' (in)'])], pending.toLeg, v => pending.toLeg = v)));
+  P.append(row('Class', selectEl([['street', 'Street'], ['ramp', 'Ramp'], ['interstate', 'Interstate']], pending.cls, v => pending.cls = v)));
+  P.append(el('label', { class: 'ck', style: 'margin:6px 0;display:flex' }, el('input', { type: 'checkbox', checked: !!pending.reverse, on: { change: e => pending.reverse = e.target.checked } }), 'Also create the opposite direction (uses the matching out/in leg slots)'));
+  P.append(el('div', { class: 'row' },
+    el('button', { class: 'on', on: { click: () => { if ((a.type === 'tmc' && !pending.fromLeg) || (b.type === 'tmc' && !pending.toLeg)) { alert('Choose the leg(s).'); return; } createLink(pending); } } }, 'Create'),
+    el('button', { on: { click: () => { pending = null; renderPanel(); } } }, 'Cancel')));
+}
+function linkPanel(P, l) {
+  const sc = cur(); const d = sc.links[l.id] ||= {}; const st = C.st[l.id], v = C.val[l.id];
+  const a = nodeById(l.from), b = nodeById(l.to);
+  P.append(el('h2', {}, 'Link'));
+  P.append(el('div', { class: 'muted' }, `${l.id} · `, el('a', { href: '#', on: { click: e => { e.preventDefault(); select({ type: 'node', id: a.id }); } } }, (a?.label || a?.id) + (l.fromLeg ? ` [${l.fromLeg} out]` : '')), ' → ', el('a', { href: '#', on: { click: e => { e.preventDefault(); select({ type: 'node', id: b.id }); } } }, (b?.label || b?.id) + (l.toLeg ? ` [${l.toLeg} in]` : ''))));
+  P.append(row('Name', el('input', { type: 'text', value: l.label || '', on: { change: e => { snapshot(); l.label = e.target.value; commit(); } } })));
+  P.append(row('Class', selectEl([['interstate', 'Interstate'], ['street', 'Street'], ['ramp', 'Ramp']], l.cls || 'street', val => { snapshot(); l.cls = val; commit(); })));
+  P.append(el('h3', {}, 'Balanced volume'));
+  P.append(el('div', {}, el('b', { style: 'font-size:18px' }, fmt(v)), el('span', { class: 'muted' }, `  ${STNAME[st]}`)));
+  const mode = d.mode || 'auto';
+  const modes = [['auto', 'Auto: count if any, else movements, else balance'], ['derive', 'Derive: ignore counts, use movements/balance'], ['lock', 'Lock: type a value']];
+  const rg = el('div', { style: 'margin:6px 0' });
+  for (const [m, t] of modes) rg.append(el('label', { class: 'ck', style: 'display:flex;margin:2px 0' }, el('input', { type: 'radio', name: 'mode', value: m, checked: mode === m, on: { change: () => { snapshot(); d.mode = m; if (m === 'lock' && !isNum(d.balanced)) d.balanced = Math.round(v || 0); commit(); } } }), t));
+  P.append(rg);
+  const vi = el('input', { type: 'number', value: isNum(d.balanced) ? d.balanced : (v !== undefined ? Math.round(v) : ''), disabled: mode !== 'lock', on: { change: e => { snapshot(); d.balanced = +e.target.value; d.mode = 'lock'; commit(); } } });
+  P.append(row('Value', vi, el('button', { class: 'small', title: 'Lock the current computed value', on: { click: () => { snapshot(); d.mode = 'lock'; d.balanced = Math.round(v || 0); commit(); } } }, 'Lock current')));
+  P.append(el('h3', {}, 'Observed counts'));
+  const tbl = el('table'); tbl.append(el('tr', {}, el('th', { title: 'primary count used in Auto mode' }, '●'), el('th', {}, 'Source'), el('th', {}, 'Date'), el('th', {}, 'Value'), el('th', { title: 'apply growth' }, 'Grow'), el('th', {}, '')));
+  (d.observed || []).forEach((o, i) => {
+    const tr = el('tr');
+    tr.append(el('td', {}, el('input', { type: 'radio', name: 'prim', checked: (d.primary || 0) === i, on: { change: () => { snapshot(); d.primary = i; commit(); } } })));
+    tr.append(el('td', {}, el('input', { type: 'text', value: o.source || '', style: 'width:58px;padding:2px 4px', on: { change: e => { snapshot(); o.source = e.target.value; commit(); } } })));
+    tr.append(el('td', {}, el('input', { type: 'text', value: o.date || '', style: 'width:82px;padding:2px 4px', placeholder: 'YYYY-MM-DD', on: { change: e => { snapshot(); o.date = e.target.value; commit(); } } })));
+    tr.append(el('td', {}, el('input', { type: 'number', value: o.value, style: 'width:62px', on: { change: e => { snapshot(); o.value = +e.target.value; commit(); } } })));
+    tr.append(el('td', {}, el('input', { type: 'checkbox', checked: o.growth !== false, on: { change: e => { snapshot(); o.growth = e.target.checked ? undefined : false; commit(); } } })));
+    tr.append(el('td', {}, el('button', { class: 'small danger', on: { click: () => { snapshot(); d.observed.splice(i, 1); if (d.primary >= d.observed.length) d.primary = 0; commit(); } } }, '✕')));
+    tbl.append(tr);
+  });
+  P.append(tbl);
+  P.append(el('div', { class: 'row' }, el('button', { class: 'small', on: { click: () => { snapshot(); (d.observed ||= []).push({ source: 'TCDS', date: '', value: Math.round(v || 0) }); commit(); } } }, '+ add count')));
+  P.append(el('h3', {}, 'Comparison'));
+  const cl = el('div', { class: 'chipl' });
+  for (const c of C.chips[l.id]) cl.append(el('span', { class: 'chip' }, `${c.label}`, el('b', {}, fmt(c.value)), c.grown ? el('span', { class: 'muted' }, `(raw ${fmt(c.raw)})`) : null, el('span', { class: 'd-' + dcls(c.diff, C.S) }, c.used ? '← used' : pct(c.diff))));
+  if (!C.chips[l.id].length) cl.append(el('span', { class: 'muted' }, 'No counts or movements attached.'));
+  P.append(cl);
+  P.append(el('h3', {}, 'Display'));
+  P.append(row('Label pos.', el('input', { type: 'range', min: 0.1, max: 0.9, step: 0.05, value: isNum(l.labelT) ? l.labelT : 0.5, on: { input: e => { l.labelT = +e.target.value; render(); }, change: () => markDirty() } })));
+  P.append(row('Note', el('textarea', { rows: 2, on: { change: e => { snapshot(); d.note = e.target.value; commit(); } } }, d.note || '')));
+  const rev = reverseOf(l);
+  P.append(el('div', { class: 'row', style: 'margin-top:14px' },
+    rev ? el('button', { on: { click: () => select({ type: 'link', id: rev.id }) } }, 'Go to opposite direction') : el('button', { on: { click: () => { snapshot(); const r = makeReverse(l); if (r) { sel = { type: 'link', id: r.id }; commit(); } else banner('Opposite link not created: that leg slot is already used.', [], 5000); } } }, 'Create opposite direction'),
+    el('button', { class: 'danger', on: { click: deleteSel } }, 'Delete link')));
+}
+function nodePanel(P, n) {
+  P.append(el('h2', {}, n.type === 'junction' ? 'Junction' : 'Terminal'), el('div', { class: 'muted' }, `${n.id} · ${nodeName(n)}`));
+  P.append(row('Label', el('input', { type: 'text', value: n.label || '', on: { change: e => { snapshot(); n.label = e.target.value; commit(); } } })));
+  P.append(row('Type', selectEl([['junction', 'Junction (flow is conserved)'], ['terminal', 'Terminal (network edge)']], n.type, val => { snapshot(); n.type = val; commit(); })));
+  const ins = C.adj[n.id].in, outs = C.adj[n.id].out;
+  if (n.type === 'junction') {
+    const gs = C.nodeGroups[n.id] || [];
+    for (const grp of gs) {
+      const sIn = grp.in.reduce((a, id) => a + (C.val[id] || 0), 0), sOut = grp.out.reduce((a, id) => a + (C.val[id] || 0), 0);
+      const nm = gs.length > 1 ? `${linkById(grp.in[0])?.label || grp.in[0]} → ${linkById(grp.out[0])?.label || grp.out[0]}: ` : '';
+      P.append(el('div', { style: 'margin:6px 0' }, nm, `Σ in ${fmt(sIn)} · Σ out ${fmt(sOut)} · `, el('b', { class: 'd-' + (Math.abs(sIn - sOut) > 0.5 ? 'bad' : 'ok') }, `Δ ${fmt(sIn - sOut)}`)));
+    }
+    const twoWay = ins.length === 2 && outs.length === 2 && ins.every(i => { const r = reverseOf(linkById(i)); return r && outs.includes(r.id); });
+    P.append(row('Directional', selectEl([['', twoWay ? 'auto (two-way street: balance each direction)' : 'auto (single balance over all links)'], ['true', 'force: balance each direction'], ['false', 'force: one balance over all links']], n.directional === true ? 'true' : n.directional === false ? 'false' : '', v => { snapshot(); if (v === '') delete n.directional; else n.directional = v === 'true'; commit(); })));
+    if (n.directional === true && !twoWay) P.append(el('div', { class: 'muted' }, 'Directional balance needs exactly two opposite-direction pairs here; using one balance for now.'));
+  }
+  const list = (title, ids) => { P.append(el('h3', {}, title)); if (!ids.length) P.append(el('div', { class: 'muted' }, 'none')); for (const id of ids) { const l = linkById(id); P.append(el('div', {}, el('a', { href: '#', on: { click: e => { e.preventDefault(); select({ type: 'link', id }); } } }, l.label || id), ` · ${fmt(C.val[id])} `, el('span', { class: 'muted' }, STNAME[C.st[id]]))); } };
+  list('Incoming', ins); list('Outgoing', outs);
+  P.append(el('div', { class: 'row', style: 'margin-top:14px' }, el('button', { on: { click: () => { setTool('connect'); connectFrom = { id: n.id }; svg.classList.add('connecting'); render(); renderPanel(); } } }, 'Connect from here'), el('button', { class: 'danger', on: { click: deleteSel } }, 'Delete node')));
+}
+function tmcPanel(P, n) {
+  const sc = cur(); const t = sc.tmc[n.id] ||= { movements: {} }; const info = C.tmc[n.id];
+  P.append(el('h2', {}, 'Intersection'), el('div', { class: 'muted' }, n.id));
+  P.append(row('Label', el('input', { type: 'text', value: n.label || '', on: { change: e => { snapshot(); n.label = e.target.value; commit(); } } })));
+  P.append(el('h3', {}, 'Movement source'));
+  const srcOpts = [['', 'manual (typed)'], ...Object.entries(model.sources).map(([id, s]) => [id, s.name || id])];
+  P.append(row('Source', selectEl(srcOpts, t.source?.id || '', val => {
+    snapshot();
+    if (!val) { t.movements = { ...info.m }; delete t.source; delete t.overrides; }
+    else { const s = model.sources[val]; const inter = Object.keys(s.data || {})[0] || ''; t.source = { id: val, intersection: inter }; t.overrides = {}; }
+    commit();
+  })));
+  if (t.source?.id && model.sources[t.source.id]) {
+    const s = model.sources[t.source.id];
+    P.append(row('Intersection', selectEl(Object.keys(s.data || {}).map(k => [k, k]), t.source.intersection, val => { snapshot(); t.source.intersection = val; commit(); })));
+    const inter = s.data?.[t.source.intersection] || {}; const dts = Object.keys(inter);
+    const times = [...new Set(dts.flatMap(dt => Object.keys(inter[dt])))].sort((a, b) => toMin(a) - toMin(b));
+    P.append(row('Day type', selectEl([['', `scenario (${sc.dayType || '—'})`], ...dts.map(k => [k, k])], t.source.dayType || '', val => { snapshot(); if (val) t.source.dayType = val; else delete t.source.dayType; commit(); })));
+    P.append(row('Start', selectEl([['', `scenario (${tLabel(sc.start)})`], ...times.map(k => [k, tLabel(k)])], t.source.start || '', val => { snapshot(); if (val) t.source.start = val; else delete t.source.start; commit(); })));
+    P.append(row('Bins (15 min)', el('input', { type: 'number', min: 1, max: 96, value: t.source.bins || '', placeholder: String(sc.bins), on: { change: e => { snapshot(); if (+e.target.value) t.source.bins = +e.target.value; else delete t.source.bins; commit(); } } })));
+    P.append(el('div', { class: 'muted' }, info.src ? `${info.src.found}/${info.src.n} bins found for ${info.src.dt || '(no day type)'} from ${tLabel(info.src.start)}${info.src.found < info.src.n ? ' — partial hour' : ''}` : 'no data for this selection'));
+  }
+  P.append(el('h3', {}, 'Movements (veh/h)'));
+  const tbl = el('table'); tbl.append(el('tr', {}, el('th', {}, ''), el('th', {}, 'Left'), el('th', {}, 'Thru'), el('th', {}, 'Right'), el('th', {}, 'Σ appr.')));
+  for (const dir of ['NB', 'SB', 'EB', 'WB']) {
+    const tr = el('tr', {}, el('td', {}, el('b', {}, dir)));
+    for (const tt of ['L', 'T', 'R']) {
+      const k = dir + tt; const td = el('td', { class: info.ov[k] ? 'ov' : '' });
+      td.append(el('input', { type: 'number', min: 0, value: info.m[k], on: { change: e => { snapshot(); t.movements ||= {}; t.movements[k] = +e.target.value || 0; if (info.bound) { t.overrides ||= {}; t.overrides[k] = true; } commit(); } } }));
+      if (info.ov[k]) td.append(el('button', { class: 'small', title: 'reset to source value', on: { click: () => { snapshot(); delete t.overrides[k]; commit(); } } }, '↺'));
+      tr.append(td);
+    }
+    tr.append(el('td', {}, fmt(info.m[dir + 'L'] + info.m[dir + 'T'] + info.m[dir + 'R'])));
+    tbl.append(tr);
+  }
+  P.append(tbl);
+  if (info.bound) P.append(el('div', { class: 'row' }, el('button', { class: 'small', on: { click: () => { snapshot(); t.overrides = {}; commit(); } } }, 'Reset all overrides'), el('span', { class: 'muted' }, 'orange = typed override')));
+  P.append(el('h3', {}, 'Extra movements'));
+  P.append(el('div', { class: 'muted' }, 'U-turns, second turn lanes or any movement the source lacks. They appear in the box next to the matching standard movement (U-turn leftmost from the driver\'s view) and count toward the approach and departure sums.'));
+  n.extras ||= [];
+  if (n.extras.length) {
+    const xt = el('table'); xt.append(el('tr', {}, el('th', {}, 'Label'), el('th', {}, 'From'), el('th', {}, 'To'), el('th', {}, 'Type'), el('th', {}, 'veh/h'), el('th', {}, '')));
+    for (const x of n.extras) {
+      const legSel = (val, cb) => { const s = selectEl(LEGS.map(L => [L, `${L} (${APPR[L]})`]), val, v => { snapshot(); cb(v); commit(); }); s.style.padding = '2px'; s.title = 'leg (approach direction on that leg)'; return s; };
+      xt.append(el('tr', {},
+        el('td', {}, el('input', { type: 'text', value: x.label, style: 'width:80px;padding:2px 4px', on: { change: e => { snapshot(); x.label = e.target.value; commit(); } } })),
+        el('td', {}, legSel(x.from, v => x.from = v)), el('td', {}, legSel(x.to, v => x.to = v)),
+        el('td', { class: 'muted' }, `${APPR[x.from] || ''} ${({ U: 'U-turn', L: 'left', T: 'thru', R: 'right' })[turnType(x.from, x.to)] || '?'}`),
+        el('td', {}, el('input', { type: 'number', min: 0, value: info.m[x.key], style: 'width:62px', on: { change: e => { snapshot(); t.movements ||= {}; t.movements[x.key] = +e.target.value || 0; commit(); } } })),
+        el('td', {}, el('button', { class: 'small danger', on: { click: () => { snapshot(); n.extras = n.extras.filter(y => y !== x); if (t.movements) delete t.movements[x.key]; commit(); } } }, '✕'))));
+    }
+    P.append(xt);
+  }
+  const addSel = selectEl([['', '+ add movement…'], ...EXTRA_PRESETS.map(p => [p.join('|'), p[0]]), ['custom', 'custom (choose legs)']], '', v => {
+    if (!v) return; snapshot(); const [label, from, to] = v === 'custom' ? ['New movement', 'S', 'N'] : v.split('|');
+    n.extras.push({ key: uid('mv'), label, from, to }); commit();
+  });
+  P.append(el('div', { class: 'row' }, addSel));
+  P.append(el('h3', {}, 'Legs'));
+  const lt = el('table'); lt.append(el('tr', {}, el('th', {}, 'Leg'), el('th', {}, 'In (approach)'), el('th', {}, 'Out (departure)')));
+  for (const L of LEGS) {
+    const ll = legLinks(n.id, L);
+    const cellFor = (lnk, sum) => el('td', {}, lnk ? el('a', { href: '#', on: { click: e => { e.preventDefault(); select({ type: 'link', id: lnk.id }); } } }, lnk.label || lnk.id) : el('span', { class: 'muted' }, 'no link'), ` · ${fmt(sum)}`);
+    lt.append(el('tr', {}, el('td', {}, `${LEG_NAME[L]} (${APPR[L]} approach)`), cellFor(ll.in, info.sums.in[L]), cellFor(ll.out, info.sums.out[L])));
+  }
+  P.append(lt);
+  P.append(row('Note', el('textarea', { rows: 2, on: { change: e => { snapshot(); t.note = e.target.value; commit(); } } }, t.note || '')));
+  P.append(el('div', { class: 'row', style: 'margin-top:14px' }, el('button', { on: { click: () => { setTool('connect'); render(); renderPanel(); } } }, 'Connect (click a port)'), el('button', { class: 'danger', on: { click: deleteSel } }, 'Delete intersection')));
+}
+// ---------------------------------------------------------------- scenarios & settings dialogs
+function refreshScenarioSelect() {
+  const s = $('scSel'); s.innerHTML = '';
+  for (const [id, sc] of Object.entries(model.scenarios)) s.append(el('option', { value: id, selected: id === scId }, sc.name || id));
+}
+function allDayTypes() { return [...new Set(Object.values(model.sources).flatMap(s => Object.values(s.data || {}).flatMap(i => Object.keys(i))))]; }
+function allTimes() { return [...new Set(Object.values(model.sources).flatMap(s => Object.values(s.data || {}).flatMap(i => Object.values(i).flatMap(d => Object.keys(d)))))].sort((a, b) => toMin(a) - toMin(b)); }
+function openSettings() {
+  const D = $('dlgSettings'); D.innerHTML = ''; const S = model.settings, sc = cur();
+  const f = {};
+  D.append(el('h2', {}, 'Settings'));
+  D.append(row('Network name', f.name = el('input', { type: 'text', value: model.meta.name || '' })));
+  D.append(row('Base year', f.baseYear = el('input', { type: 'number', value: S.baseYear })));
+  D.append(row('Growth %/yr on counts', f.growth = el('input', { type: 'number', step: 0.1, value: S.growthPct })));
+  D.append(row('OK threshold ±%', f.ok = el('input', { type: 'number', step: 0.5, value: S.okPct })));
+  D.append(row('Warning threshold ±%', f.warn = el('input', { type: 'number', step: 0.5, value: S.warnPct })));
+  D.append(el('h3', {}, `Scenario: ${sc.name || scId}`));
+  D.append(row('Scenario name', f.scName = el('input', { type: 'text', value: sc.name || '' })));
+  const dts = allDayTypes(); D.append(row('Day type', f.dt = selectEl([['', '—'], ...dts.map(k => [k, k]), ...(sc.dayType && !dts.includes(sc.dayType) ? [[sc.dayType, sc.dayType]] : [])], sc.dayType || '', () => { })));
+  const ts = allTimes(); D.append(row('Peak hour start', f.start = selectEl([...(ts.length ? ts : [sc.start]).map(k => [k, tLabel(k)]), ...(ts.length && !ts.includes(sc.start) ? [[sc.start, tLabel(sc.start)]] : [])], sc.start, () => { })));
+  D.append(row('Bins (15 min)', f.bins = el('input', { type: 'number', min: 1, max: 96, value: sc.bins })));
+  D.append(el('div', { class: 'foot' }, el('button', { on: { click: () => D.close() } }, 'Cancel'), el('button', { class: 'on', on: { click: () => {
+    snapshot(); model.meta.name = f.name.value; S.baseYear = +f.baseYear.value || S.baseYear; S.growthPct = +f.growth.value || 0; S.okPct = +f.ok.value || 5; S.warnPct = +f.warn.value || 10;
+    sc.name = f.scName.value || sc.name; sc.dayType = f.dt.value; sc.start = f.start.value || sc.start; sc.bins = +f.bins.value || 4;
+    D.close(); refreshScenarioSelect(); commit(); } } }, 'Apply')));
+  D.showModal();
+}
+function openScenarios() {
+  const D = $('dlgSettings'); D.innerHTML = '';
+  D.append(el('h2', {}, 'Scenarios'), el('div', { class: 'muted' }, 'Scenarios share the network drawing; each has its own counts, locks and movements.'));
+  const tbl = el('table');
+  for (const [id, sc] of Object.entries(model.scenarios)) {
+    tbl.append(el('tr', {}, el('td', {}, el('input', { type: 'text', value: sc.name || id, on: { change: e => { snapshot(); sc.name = e.target.value; markDirty(); refreshScenarioSelect(); } } })),
+      el('td', {}, `${sc.dayType || '—'} · ${tLabel(sc.start)}`),
+      el('td', {}, el('button', { class: 'small', on: { click: () => { snapshot(); const nid = uid('sc'); model.scenarios[nid] = JSON.parse(JSON.stringify({ ...sc, name: (sc.name || id) + ' copy' })); scId = nid; D.close(); refreshScenarioSelect(); commit(); } } }, 'Duplicate'), ' ',
+        el('button', { class: 'small danger', on: { click: () => { if (Object.keys(model.scenarios).length < 2) { alert('Keep at least one scenario.'); return; } if (!confirm(`Delete scenario "${sc.name || id}"?`)) return; snapshot(); delete model.scenarios[id]; if (scId === id) scId = Object.keys(model.scenarios)[0]; D.close(); refreshScenarioSelect(); commit(); } } }, 'Delete'))));
+  }
+  D.append(tbl);
+  D.append(el('div', { class: 'foot' }, el('button', { on: { click: () => { snapshot(); const nid = uid('sc'); model.scenarios[nid] = { name: 'New scenario', dayType: cur().dayType, start: cur().start, bins: cur().bins, links: {}, tmc: {} }; scId = nid; D.close(); refreshScenarioSelect(); commit(); } } }, '+ Empty scenario'), el('button', { class: 'on', on: { click: () => D.close() } }, 'Close')));
+  D.showModal();
+}
+
+// ---------------------------------------------------------------- files
+function pretty(v, ind = '') {
+  if (Array.isArray(v)) {
+    if (v.every(x => typeof x !== 'object' || x === null)) return JSON.stringify(v);
+    return '[\n' + v.map(x => ind + '  ' + pretty(x, ind + '  ')).join(',\n') + '\n' + ind + ']';
+  }
+  if (v && typeof v === 'object') {
+    const ks = Object.keys(v).filter(k => v[k] !== undefined); if (!ks.length) return '{}';
+    return '{\n' + ks.map(k => ind + '  ' + JSON.stringify(k) + ': ' + pretty(v[k], ind + '  ')).join(',\n') + '\n' + ind + '}';
+  }
+  return JSON.stringify(v);
+}
+function idb() { return new Promise((res, rej) => { const r = indexedDB.open('vb', 1); r.onupgradeneeded = () => r.result.createObjectStore('kv'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+async function idbSet(k, v) { try { const db = await idb(); await new Promise((res, rej) => { const tx = db.transaction('kv', 'readwrite'); tx.objectStore('kv').put(v, k); tx.oncomplete = res; tx.onerror = () => rej(tx.error); }); } catch (e) { } }
+async function idbGet(k) { try { const db = await idb(); return await new Promise((res, rej) => { const tx = db.transaction('kv'); const q = tx.objectStore('kv').get(k); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); } catch (e) { return undefined; } }
+function download(name, text, type = 'application/json') {
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+function loadText(text, name) {
+  let obj; try { obj = JSON.parse(text); } catch (e) { alert('Not valid JSON: ' + e.message); return false; }
+  if (!obj.nodes || !obj.links) { alert('This JSON has no nodes/links.'); return false; }
+  model = normalize(obj); scId = model.scenarios[model.defaultScenario] ? model.defaultScenario : Object.keys(model.scenarios)[0];
+  sel = null; pending = null; undoStack = []; redoStack = []; dirty = false; document.title = 'Volume Balance';
+  $('fileName').textContent = name || 'loaded'; refreshScenarioSelect(); fit(); renderPanel(); return true;
+}
+async function openJson() {
+  if (window.showOpenFilePicker) {
+    try { const [h] = await window.showOpenFilePicker({ types: [{ description: 'Network JSON', accept: { 'application/json': ['.json'] } }] }); const f = await h.getFile(); if (loadText(await f.text(), h.name)) { fileHandle = h; await idbSet('handle', h); $('btnReconnect').hidden = true; } return; }
+    catch (e) { if (e.name === 'AbortError') return; }
+  }
+  $('fileJson').click();
+}
+$('fileJson').addEventListener('change', async e => { const f = e.target.files[0]; if (!f) return; loadText(await f.text(), f.name); fileHandle = null; e.target.value = ''; });
+function serialize() { model.meta.saved = new Date().toISOString(); model.defaultScenario = scId; return pretty(model) + '\n'; }
+async function saveAs() {
+  if (window.showSaveFilePicker) {
+    try { const h = await window.showSaveFilePicker({ suggestedName: fileHandle?.name || 'network.json', types: [{ description: 'Network JSON', accept: { 'application/json': ['.json'] } }] }); fileHandle = h; await idbSet('handle', h); $('btnReconnect').hidden = true; return save(); }
+    catch (e) { if (e.name === 'AbortError') return; }
+  }
+  download(fileHandle?.name || 'network.json', serialize()); afterSave('downloaded');
+}
+async function save() {
+  if (!fileHandle) return saveAs();
+  try {
+    if (await fileHandle.queryPermission({ mode: 'readwrite' }) !== 'granted' && await fileHandle.requestPermission({ mode: 'readwrite' }) !== 'granted') return saveAs();
+    const w = await fileHandle.createWritable(); await w.write(serialize()); await w.close(); afterSave(fileHandle.name);
+  } catch (e) { alert('Could not write to the file: ' + e.message); }
+}
+function afterSave(name) { dirty = false; document.title = 'Volume Balance'; $('fileName').textContent = name; try { localStorage.removeItem('vb_autosave'); } catch (e) { } renderStatus(); banner(`Saved ${name} at ${new Date().toLocaleTimeString()}`, [], 2500); }
+async function reconnect() {
+  const h = await idbGet('handle'); if (!h) return;
+  try { if (await h.requestPermission({ mode: 'readwrite' }) !== 'granted') return; const f = await h.getFile(); if (loadText(await f.text(), h.name)) { fileHandle = h; $('btnReconnect').hidden = true; } }
+  catch (e) { alert('Could not reopen the file: ' + e.message); }
+}
+let bannerTimer = 0;
+function banner(msg, actions = [], ttl = 0) {
+  const b = $('banner'); b.innerHTML = ''; b.style.display = 'flex'; clearTimeout(bannerTimer);
+  b.append(el('span', {}, msg));
+  for (const [t, fn] of actions) b.append(el('button', { class: 'small', on: { click: () => { b.style.display = 'none'; fn(); } } }, t));
+  b.append(el('button', { class: 'small', on: { click: () => b.style.display = 'none' } }, '✕'));
+  if (ttl) bannerTimer = setTimeout(() => b.style.display = 'none', ttl);
+}
+// ---------------------------------------------------------------- StreetLight import
+function parseCsv(text) {
+  const rows = []; let row = [], f = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) { if (c === '"') { if (text[i + 1] === '"') { f += '"'; i++; } else q = false; } else f += c; }
+    else if (c === '"') q = true; else if (c === ',') { row.push(f); f = ''; }
+    else if (c === '\n') { row.push(f); rows.push(row); row = []; f = ''; } else if (c !== '\r') f += c;
+  }
+  if (f !== '' || row.length) { row.push(f); rows.push(row); }
+  return rows;
+}
+function importStl(text, fname) {
+  const rows = parseCsv(text.replace(/^﻿/, ''));
+  const hi = rows.findIndex(r => r.includes('INTID') && r.includes('NBL'));
+  if (hi < 0) { alert('This does not look like a StreetLight *_tmc_full_table.csv (needs INTID, NBL … columns).'); return; }
+  const h = rows[hi]; const ix = k => h.indexOf(k); const iT = ix('TIME'), iN = ix('Intersection Name'), iD = ix('Day Type'), iDate = ix('DATE'); const iM = MOV.map(k => ix(k));
+  if (iM.some(i => i < 0) || iT < 0 || iN < 0) { alert('Missing movement columns.'); return; }
+  const data = {}; let period = '', n = 0;
+  for (const r of rows.slice(hi + 1)) {
+    if (r.length < h.length || !r[iN]) continue; period ||= r[iDate] || ''; n++;
+    const dt = iD >= 0 ? r[iD] : 'all'; const t = fromMin(toMin(r[iT]));
+    ((data[r[iN]] ||= {})[dt] ||= {})[t] = iM.map(i => +r[i] || 0);
+  }
+  if (!n) { alert('No rows found.'); return; }
+  const defId = 'stl_' + (fname.match(/\d{5,}/)?.[0] || Date.now().toString(36));
+  const name = prompt(`Imported ${n} rows for ${Object.keys(data).length} intersections. Name this source:`, fname.replace(/\.csv$/i, '')); if (name === null) return;
+  snapshot();
+  let id = defId; while (model.sources[id]) id += '_';
+  model.sources[id] = { name: name || id, kind: 'streetlight_tmc', period, imported: new Date().toISOString().slice(0, 10), data };
+  const sc = cur(); if (!sc.dayType) sc.dayType = Object.keys(Object.values(data)[0])[0];
+  commit(); banner(`Source "${name || id}" added. Bind an intersection box to it from its panel.`, [], 6000);
+}
+$('fileCsv').addEventListener('change', async e => { const f = e.target.files[0]; if (!f) return; importStl(await f.text(), f.name); e.target.value = ''; });
+document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('drop', async e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (!f) return; const t = await f.text(); if (/\.json$/i.test(f.name)) { loadText(t, f.name); fileHandle = null; } else if (/\.csv$/i.test(f.name)) importStl(t, f.name); });
+// ---------------------------------------------------------------- exports
+const csvq = s => { s = String(s ?? ''); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+function exportLinks() {
+  const sc = cur(); const out = [['id', 'label', 'class', 'from', 'from_leg', 'to', 'to_leg', 'balanced', 'state', 'mode', 'observed', 'comparisons', 'note'].join(',')];
+  for (const l of model.links) { const d = sc.links[l.id] || {}; const a = nodeById(l.from), b = nodeById(l.to);
+    out.push([l.id, l.label || '', l.cls || '', a?.label || l.from, l.fromLeg || '', b?.label || l.to, l.toLeg || '', Math.round(C.val[l.id] ?? NaN) || '', C.st[l.id], d.mode || 'auto',
+      (d.observed || []).map(o => `${o.source || ''} ${o.date || ''}: ${o.value}`).join(' | '), C.chips[l.id].map(c => `${c.label} ${Math.round(c.value)} ${pct(c.diff)}`).join(' | '), d.note || ''].map(csvq).join(',')); }
+  download(`links_${sc.name || scId}.csv`.replace(/\s+/g, '_'), out.join('\n'), 'text/csv');
+}
+function exportMovements() {
+  const sc = cur(); const out = [['node', 'label', 'source', 'intersection', 'day_type', 'start', ...MOV, 'extra_movements', 'total'].join(',')];
+  for (const n of model.nodes.filter(n => n.type === 'tmc')) { const i = C.tmc[n.id]; const t = sc.tmc[n.id] || {}; const ex = (n.extras || []);
+    out.push([n.id, n.label || '', t.source?.id || 'manual', t.source?.intersection || '', i.src?.dt || '', i.src?.start || '', ...MOV.map(k => i.m[k]), ex.map(x => `${x.label} ${x.from}->${x.to}=${i.m[x.key]}`).join(' | '), MOV.reduce((a, k) => a + i.m[k], 0) + ex.reduce((a, x) => a + i.m[x.key], 0)].map(csvq).join(',')); }
+  download(`movements_${sc.name || scId}.csv`.replace(/\s+/g, '_'), out.join('\n'), 'text/csv');
+}
+function svgText() {
+  const src = $('canvas'); const clone = src.cloneNode(true); clone.querySelector('#gGhost')?.remove();
+  const xs = model.nodes.map(n => n.x), ys = model.nodes.map(n => n.y);
+  const minX = Math.min(...xs) - 180, maxX = Math.max(...xs) + 180, minY = Math.min(...ys) - 140, maxY = Math.max(...ys) + 160;
+  clone.setAttribute('viewBox', `${minX} ${minY} ${maxX - minX} ${maxY - minY}`); clone.setAttribute('width', maxX - minX); clone.setAttribute('height', maxY - minY);
+  clone.querySelector('#world').setAttribute('transform', '');
+  const cs = getComputedStyle(document.documentElement);
+  let css = '';
+  for (const sh of document.styleSheets) { try { for (const r of sh.cssRules) if (/^(svg text|\.lk|\.lbl|\.chipg|\.nd|\.imb)/.test(r.selectorText || '')) css += r.cssText + '\n'; } catch (e) { } }
+  css = css.replace(/var\((--[\w-]+)\)/g, (m, v) => cs.getPropertyValue(v).trim() || m).replace(/color-mix\(in srgb,\s*([^ ]+) (\d+)%,\s*([^)]+)\)/g, (m, a, p, b) => a);
+  clone.insertBefore(svgEl('style', {}, [css]), clone.firstChild);
+  clone.insertBefore(svgEl('rect', { x: minX, y: minY, width: maxX - minX, height: maxY - minY, fill: cs.getPropertyValue('--bg').trim() || '#fff' }), clone.querySelector('#world'));
+  clone.querySelectorAll('marker path').forEach(p => p.setAttribute('fill', cs.getPropertyValue(p.getAttribute('fill').replace(/var\(|\)/g, '')).trim()));
+  return { text: new XMLSerializer().serializeToString(clone), w: maxX - minX, h: maxY - minY };
+}
+function exportSvg() { download(`volume_balance_${cur().name || scId}.svg`.replace(/\s+/g, '_'), svgText().text, 'image/svg+xml'); }
+function exportPng() {
+  const { text, w, h } = svgText(); const img = new Image(); const url = URL.createObjectURL(new Blob([text], { type: 'image/svg+xml' }));
+  img.onload = () => { const c = document.createElement('canvas'); c.width = w * 2; c.height = h * 2; const ctx = c.getContext('2d'); ctx.scale(2, 2); ctx.drawImage(img, 0, 0); URL.revokeObjectURL(url);
+    c.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `volume_balance_${cur().name || scId}.png`.replace(/\s+/g, '_'); a.click(); }, 'image/png'); };
+  img.onerror = () => alert('PNG export failed; try SVG.'); img.src = url;
+}
+// ---------------------------------------------------------------- wiring
+function newNetwork() {
+  if (dirty && !confirm('Discard unsaved changes and start a new empty network?')) return;
+  if (!dirty && !confirm('Start a new empty network? The current one stays on disk; use Save as… to save the new one.')) return;
+  const keepSources = Object.keys(model.sources).length && confirm('Keep the imported sources (StreetLight) so new intersections can bind to them?');
+  const sc = cur();
+  model = normalize({ meta: { name: 'New network', description: '' }, settings: { ...model.settings }, nodes: [], links: [],
+    scenarios: { base: { name: 'Baseline', dayType: keepSources ? sc.dayType : '', start: sc.start || '1700', bins: sc.bins || 4, links: {}, tmc: {} } },
+    sources: keepSources ? JSON.parse(JSON.stringify(model.sources)) : {} });
+  scId = 'base'; sel = null; pending = null; connectFrom = null; fileHandle = null; undoStack = []; redoStack = []; dirty = false;
+  document.title = 'Volume Balance'; $('fileName').textContent = 'new network (unsaved)'; view = { x: 60, y: 60, k: 1 };
+  refreshScenarioSelect(); setTool('add-junction'); render(); renderPanel();
+  banner('Empty network. Use the + tools to place nodes, Connect to link them, then Save as…', [], 8000);
+}
+$('btnNew').onclick = newNetwork;
+$('btnOpen').onclick = openJson; $('btnSave').onclick = save; $('btnSaveAs').onclick = saveAs; $('btnReconnect').onclick = reconnect;
+$('btnImportStl').onclick = () => $('fileCsv').click();
+$('expSel').onchange = e => { const v = e.target.value; e.target.value = ''; if (v === 'links') exportLinks(); else if (v === 'mov') exportMovements(); else if (v === 'svg') exportSvg(); else if (v === 'png') exportPng(); };
+document.querySelectorAll('.tool').forEach(b => b.onclick = () => setTool(b.dataset.tool));
+$('btnUndo').onclick = undo; $('btnFit').onclick = fit;
+$('ckChips').onchange = render; $('ckNames').onchange = render;
+$('btnSettings').onclick = openSettings; $('btnScen').onclick = openScenarios; $('btnHelp').onclick = () => $('dlgHelp').showModal();
+$('scSel').onchange = e => { scId = e.target.value; sel = null; render(); renderPanel(); };
+document.addEventListener('keydown', e => {
+  const inField = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName) || document.querySelector('dialog[open]');
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); save(); return; }
+  if (inField) return;
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
+  else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); redo(); }
+  else if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); deleteSel(); }
+  else if (e.key === 'Escape') { if (tool !== 'select' || pending || connectFrom) setTool('select'); else select(null); }
+});
+window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
+window.addEventListener('resize', () => render());
+// ---------------------------------------------------------------- init
+async function init() {
+  let emb = {}; try { emb = JSON.parse($('embedded-data').textContent); } catch (e) { }
+  model = normalize(emb.nodes ? emb : { nodes: [], links: [], scenarios: {} });
+  scId = model.scenarios[model.defaultScenario] ? model.defaultScenario : Object.keys(model.scenarios)[0];
+  refreshScenarioSelect(); fit(); renderPanel();
+  window.VB = { get model() { return model; }, compute, render, select, makeReverse, setView: (x, y, k) => { view = { x, y, k }; render(); } };
+  try { const a = localStorage.getItem('vb_autosave'); if (a) { const o = JSON.parse(a); banner(`Unsaved draft from ${o.time} found in this browser.`, [['Restore draft', () => { model = normalize(o.model); scId = model.scenarios[o.scId] ? o.scId : Object.keys(model.scenarios)[0]; dirty = true; document.title = '• Volume Balance'; $('fileName').textContent = 'restored draft'; refreshScenarioSelect(); fit(); renderPanel(); }], ['Discard', () => localStorage.removeItem('vb_autosave')]]); } } catch (e) { }
+  const h = await idbGet('handle'); if (h && h.name) { $('btnReconnect').hidden = false; $('btnReconnect').title = `Reopen ${h.name}`; }
+}
+init();
+
+})();
+</script>
+</body>
+</html>
