@@ -1,8 +1,8 @@
 {
  "meta": {
-  "name": "I-25 / Santa Fe Dr volume balance",
-  "description": "Built from AK_Volume Balance.xlsx (Baseline 5PM), CDOT TCDS counts and StreetLight TMC 2098249.",
-  "version": 1
+  "name": "New network",
+  "description": "",
+  "saved": "2026-11-03T19:15:20.526Z"
  },
  "settings": {
   "baseYear": 2026,
@@ -10,1570 +10,205 @@
   "okPct": 5,
   "warnPct": 10
  },
- "defaultScenario": "baseline_pm",
+ "nodes": [
+  {
+   "id": "x_mw10u74aeit",
+   "type": "tmc",
+   "label": "Santa Fe Mississippi",
+   "x": 742,
+   "y": 368,
+   "extras": [
+    {
+     "key": "mv_mw12hi6zfe9",
+     "label": "NB U-turn",
+     "from": "S",
+     "to": "S"
+    },
+    {
+     "key": "mv_mw12hl6ar18",
+     "label": "NBL (2nd lane)",
+     "from": "S",
+     "to": "W"
+    }
+   ]
+  },
+  {
+   "id": "x_mw10u7nxiuv",
+   "type": "tmc",
+   "label": "New intersection",
+   "x": 1374,
+   "y": 365,
+   "extras": []
+  },
+  {
+   "id": "t_mw125b3waju",
+   "type": "terminal",
+   "label": "External",
+   "x": 1466,
+   "y": 67
+  },
+  {
+   "id": "t_mw125fymfwz",
+   "type": "terminal",
+   "label": "External",
+   "x": 835,
+   "y": 69
+  },
+  {
+   "id": "j_mw125pogkiq",
+   "type": "junction",
+   "label": "",
+   "x": 836,
+   "y": 169
+  },
+  {
+   "id": "t_mw125qvzfnq",
+   "type": "terminal",
+   "label": "External",
+   "x": 551,
+   "y": 170
+  },
+  {
+   "id": "j_mw12ab7d8j2",
+   "type": "junction",
+   "label": "",
+   "x": 1040,
+   "y": 370
+  },
+  {
+   "id": "t_mw12ewh6lhq",
+   "type": "terminal",
+   "label": "Ramp",
+   "x": 1042,
+   "y": 237
+  }
+ ],
+ "links": [
+  {
+   "id": "l_mw125ixskyh",
+   "from": "t_mw125b3waju",
+   "to": "t_mw125fymfwz",
+   "cls": "interstate"
+  },
+  {
+   "id": "l_mw125twy74i",
+   "from": "t_mw125fymfwz",
+   "to": "j_mw125pogkiq",
+   "cls": "ramp"
+  },
+  {
+   "id": "l_mw125w92dj9",
+   "from": "j_mw125pogkiq",
+   "to": "t_mw125qvzfnq",
+   "cls": "ramp"
+  },
+  {
+   "id": "l_mw12afki598",
+   "from": "x_mw10u7nxiuv",
+   "to": "j_mw12ab7d8j2",
+   "cls": "street",
+   "fromLeg": "W"
+  },
+  {
+   "id": "l_mw12aj80c2b",
+   "from": "j_mw12ab7d8j2",
+   "to": "x_mw10u74aeit",
+   "cls": "street",
+   "toLeg": "E"
+  },
+  {
+   "id": "l_mw12axzi40a",
+   "from": "x_mw10u74aeit",
+   "to": "j_mw12ab7d8j2",
+   "cls": "street",
+   "fromLeg": "E"
+  },
+  {
+   "id": "l_mw12b2i4o1w",
+   "from": "j_mw12ab7d8j2",
+   "to": "x_mw10u7nxiuv",
+   "cls": "street",
+   "toLeg": "W"
+  },
+  {
+   "id": "l_mw12f0eyt6p",
+   "from": "j_mw12ab7d8j2",
+   "to": "t_mw12ewh6lhq",
+   "cls": "ramp",
+   "labelT": 0.7
+  },
+  {
+   "id": "l_mw12g8ci6l2",
+   "from": "t_mw12ewh6lhq",
+   "to": "j_mw12ab7d8j2",
+   "cls": "ramp",
+   "labelT": 0.30000000000000004
+  }
+ ],
  "scenarios": {
-  "baseline_pm": {
-   "name": "Baseline (5 PM)",
+  "base": {
+   "name": "Baseline",
    "dayType": "0: All Days (M-Su)",
    "start": "1700",
    "bins": 4,
    "links": {
-    "ramp_sb_8th_off": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": null,
-       "value": 457
-      }
-     ]
-    },
-    "ramp_sb_8th_on": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": null,
-       "value": 369
-      }
-     ]
-    },
-    "ramp_sb_6th_off_wb": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-09-30",
-       "value": 1969
-      }
-     ]
-    },
-    "ramp_sb_6th_off_eb": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-08-04",
-       "value": 289
-      }
-     ]
-    },
-    "ramp_sb_6th_on_wb": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-07-14",
-       "value": 293
-      }
-     ]
-    },
-    "ramp_sb_6th_on_eb": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-07-14",
-       "value": 2274
-      }
-     ]
-    },
-    "i25sb_6th_alameda": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-08-04",
-       "value": 8495
-      }
-     ],
+    "l_mw125ixskyh": {
      "mode": "lock",
-     "balanced": 8055,
-     "note": "Spreadsheet AV30: typed 8055 against the 2020 count of 8495 (-5.2%)."
+     "balanced": 500
     },
-    "ramp_sb_alameda_off": {
+    "l_mw125twy74i": {},
+    "l_mw125w92dj9": {},
+    "l_mw12afki598": {},
+    "l_mw12aj80c2b": {},
+    "l_mw12axzi40a": {},
+    "l_mw12b2i4o1w": {},
+    "l_mw12f0eyt6p": {
      "observed": [
       {
        "source": "TCDS",
-       "date": "2017-04-25",
-       "value": 678
+       "date": "",
+       "value": 100
       }
      ]
     },
-    "ramp_sb_sf_off": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2017-11-02",
-       "value": 2551
-      }
-     ]
-    },
-    "ramp_sb_sf_on": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2017-11-02",
-       "value": 511
-      }
-     ]
-    },
-    "i25sb_sf_bwy": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2017-11-02",
-       "value": 5588
-      }
-     ],
-     "note": "Spreadsheet AR60 shows 2027-11-02; assumed 2017-11-02 like the other interchange counts."
-    },
-    "ramp_sb_bwy_off": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-07-16",
-       "value": 323
-      }
-     ]
-    },
-    "ramp_sb_frontage_off": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2022-10-11",
-       "value": 1343
-      }
-     ]
-    },
-    "ramp_sb_frontage_on": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-07-16",
-       "value": 1500
-      }
-     ]
-    },
-    "i25sb_arkansas": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2010-10-19",
-       "value": 7164
-      }
-     ],
-     "mode": "derive",
-     "note": "Spreadsheet derives this (AV74) and compares with the 2010 count."
-    },
-    "i25nb_arkansas": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2010-10-19",
-       "value": 4119
-      }
-     ]
-    },
-    "ramp_nb_ohio_off": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-07-15",
-       "value": 1377
-      }
-     ]
-    },
-    "ramp_nb_wash_on": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-07-15",
-       "value": 1377
-      }
-     ]
-    },
-    "ramp_nb_ohio_on": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-09-15",
-       "value": 202
-      }
-     ]
-    },
-    "i25nb_ohio_sf": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2017-11-02",
-       "value": 5040
-      }
-     ]
-    },
-    "ramp_nb_sf_off": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2017-11-02",
-       "value": 1203
-      }
-     ]
-    },
-    "ramp_nb_sf_on": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2017-11-02",
-       "value": 1150
-      }
-     ]
-    },
-    "ramp_nb_cedar_on": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2017-04-25",
-       "value": 334
-      }
-     ]
-    },
-    "i25nb_cedar_6th": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-08-04",
-       "value": 7135
-      }
-     ]
-    },
-    "ramp_nb_6th_off_wb": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-07-14",
-       "value": 1164
-      }
-     ]
-    },
-    "ramp_nb_6th_off_eb": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-07-14",
-       "value": 52
-      }
-     ]
-    },
-    "ramp_nb_6th_on_wb": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-08-04",
-       "value": 454
-      }
-     ]
-    },
-    "ramp_nb_6th_on_eb": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-07-14",
-       "value": 1569
-      }
-     ]
-    },
-    "ramp_nb_8th_off": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2022-07-27",
-       "value": 155
-      }
-     ]
-    },
-    "i25nb_8th_mid": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2022-08-31",
-       "value": 7018
-      }
-     ]
-    },
-    "ramp_nb_8th_on": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2021-11-04",
-       "value": 652
-      }
-     ]
-    },
-    "kal_alameda_i25": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-10-20",
-       "value": 1132
-      }
-     ],
-     "mode": "derive",
-     "note": "Spreadsheet BS46 derives this from the 2013 Santa Fe SB count and compares with the 2020 count."
-    },
-    "sfsb_i25_miss": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2013-04-23",
-       "value": 3236
-      }
-     ]
-    },
-    "sfnb_miss_i25": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2013-04-23",
-       "value": 2471
-      }
-     ]
-    },
-    "sfnb_i25_alameda": {
-     "observed": [
-      {
-       "source": "TCDS",
-       "date": "2020-09-15",
-       "value": 2656
-      }
-     ],
-     "mode": "derive",
-     "note": "Spreadsheet BZ46 derives this and compares with the 2020 count."
-    }
+    "l_mw12g8ci6l2": {}
    },
    "tmc": {
-    "tmc_miss_w": {
-     "source": {
-      "id": "stl_2098249",
-      "intersection": "Mississippi West"
-     },
+    "x_mw10u74aeit": {
      "movements": {
       "NBL": 0,
       "NBT": 0,
-      "NBR": 0,
-      "SBL": 69,
-      "SBT": 2231,
-      "SBR": 162,
-      "EBL": 0,
-      "EBT": 344,
-      "EBR": 147,
-      "WBL": 238,
-      "WBT": 416,
-      "WBR": 0
-     }
-    },
-    "tmc_miss_e": {
-     "source": {
-      "id": "stl_2098249",
-      "intersection": "Mississippi East"
-     },
-     "movements": {
-      "NBL": 183,
-      "NBT": 1968,
-      "NBR": 466,
-      "SBL": 0,
+      "NBR": 120,
+      "SBL": 40,
       "SBT": 0,
-      "SBR": 0,
-      "EBL": 150,
-      "EBT": 253,
-      "EBR": 0,
-      "WBL": 0,
-      "WBT": 468,
-      "WBR": 64
-     }
-    },
-    "tmc_sfsb_split": {
-     "source": {
-      "id": "stl_2098249",
-      "intersection": "Santa Fe SB"
-     },
-     "overrides": {
-      "SBT": true,
-      "SBL": true
-     },
-     "movements": {
-      "NBL": 0,
-      "NBT": 0,
-      "NBR": 0,
-      "SBL": 0,
-      "SBT": 2250,
-      "SBR": 397,
+      "SBR": 20,
       "EBL": 0,
-      "EBT": 0,
-      "EBR": 0,
-      "WBL": 0,
-      "WBT": 0,
-      "WBR": 0
-     },
-     "note": "StreetLight reports SBL 1125 and SBT 1125 for the same roadway continuing south (plus SBR 397). Combined as SBT 2250. The spreadsheet typed 2647 as through, which double-counted the 397 right turns in its approach total (3044)."
-    },
-    "tmc_ariz_sb": {
-     "source": {
-      "id": "stl_2098249",
-      "intersection": "Intersection 05"
-     },
-     "note": "StreetLight 'Intersection 05' = SB through just north of Arizona (no cross-street movements captured).",
-     "movements": {
-      "NBL": 0,
-      "NBT": 0,
-      "NBR": 0,
-      "SBL": 0,
-      "SBT": 2172,
-      "SBR": 0,
-      "EBL": 0,
-      "EBT": 0,
+      "EBT": 360,
       "EBR": 0,
       "WBL": 0,
       "WBT": 0,
       "WBR": 0
      }
     },
-    "tmc_ariz_nb": {
-     "source": {
-      "id": "stl_2098249",
-      "intersection": "Arizona"
-     },
+    "x_mw10u7nxiuv": {
      "movements": {
       "NBL": 0,
-      "NBT": 2623,
-      "NBR": 5,
+      "NBT": 0,
+      "NBR": 0,
       "SBL": 0,
       "SBT": 0,
       "SBR": 0,
-      "EBL": 6,
-      "EBT": 0,
+      "EBL": 20,
+      "EBT": 400,
       "EBR": 0,
       "WBL": 0,
       "WBT": 0,
-      "WBR": 8
-     }
-    },
-    "tmc_lou_nb": {
-     "source": {
-      "id": "stl_2098249",
-      "intersection": "Lousiana"
-     },
-     "movements": {
-      "NBL": 0,
-      "NBT": 2629,
-      "NBR": 16,
-      "SBL": 0,
-      "SBT": 0,
-      "SBR": 0,
-      "EBL": 0,
-      "EBT": 0,
-      "EBR": 0,
-      "WBL": 0,
-      "WBT": 0,
-      "WBR": 9
-     }
-    },
-    "tmc_florida": {
-     "source": {
-      "id": "stl_2098249",
-      "intersection": "Florida"
-     },
-     "movements": {
-      "NBL": 125,
-      "NBT": 2321,
-      "NBR": 8,
-      "SBL": 1,
-      "SBT": 2030,
-      "SBR": 16,
-      "EBL": 205,
-      "EBT": 2,
-      "EBR": 123,
-      "WBL": 22,
-      "WBT": 12,
-      "WBR": 4
+      "WBR": 0
      }
     }
    }
   }
  },
- "nodes": [
-  {
-   "id": "sb_n",
-   "type": "terminal",
-   "label": "I-25 SB from north",
-   "x": 700,
-   "y": 20
-  },
-  {
-   "id": "sb_8th_off",
-   "type": "junction",
-   "label": "",
-   "x": 700,
-   "y": 150
-  },
-  {
-   "id": "sb_8th_on",
-   "type": "junction",
-   "label": "",
-   "x": 700,
-   "y": 210
-  },
-  {
-   "id": "sb_6th_off",
-   "type": "junction",
-   "label": "",
-   "x": 700,
-   "y": 340
-  },
-  {
-   "id": "sb_6th_on",
-   "type": "junction",
-   "label": "",
-   "x": 700,
-   "y": 440
-  },
-  {
-   "id": "sb_alameda_off",
-   "type": "junction",
-   "label": "",
-   "x": 700,
-   "y": 580
-  },
-  {
-   "id": "sb_sf_off",
-   "type": "junction",
-   "label": "",
-   "x": 700,
-   "y": 700
-  },
-  {
-   "id": "sb_sf_on",
-   "type": "junction",
-   "label": "",
-   "x": 700,
-   "y": 790
-  },
-  {
-   "id": "sb_bwy_off",
-   "type": "junction",
-   "label": "",
-   "x": 700,
-   "y": 930
-  },
-  {
-   "id": "sb_frontage_off",
-   "type": "junction",
-   "label": "",
-   "x": 700,
-   "y": 990
-  },
-  {
-   "id": "sb_frontage_on",
-   "type": "junction",
-   "label": "",
-   "x": 700,
-   "y": 1050
-  },
-  {
-   "id": "sb_s",
-   "type": "terminal",
-   "label": "I-25 SB to south",
-   "x": 700,
-   "y": 1180
-  },
-  {
-   "id": "t_sb_8th_off",
-   "type": "terminal",
-   "label": "8th Ave off",
-   "x": 520,
-   "y": 150
-  },
-  {
-   "id": "t_sb_8th_on",
-   "type": "terminal",
-   "label": "8th Ave on",
-   "x": 520,
-   "y": 210
-  },
-  {
-   "id": "sb_6th_off_split",
-   "type": "junction",
-   "label": "",
-   "x": 560,
-   "y": 340
-  },
-  {
-   "id": "t_sb_6th_off_wb",
-   "type": "terminal",
-   "label": "to 6th Ave WB",
-   "x": 420,
-   "y": 310
-  },
-  {
-   "id": "t_sb_6th_off_eb",
-   "type": "terminal",
-   "label": "to 6th Ave EB",
-   "x": 420,
-   "y": 370
-  },
-  {
-   "id": "sb_6th_on_merge",
-   "type": "junction",
-   "label": "",
-   "x": 560,
-   "y": 440
-  },
-  {
-   "id": "t_sb_6th_on_wb",
-   "type": "terminal",
-   "label": "from 6th Ave WB",
-   "x": 420,
-   "y": 410
-  },
-  {
-   "id": "t_sb_6th_on_eb",
-   "type": "terminal",
-   "label": "from 6th Ave EB",
-   "x": 420,
-   "y": 470
-  },
-  {
-   "id": "t_sb_alameda_off",
-   "type": "terminal",
-   "label": "Alameda off",
-   "x": 520,
-   "y": 580
-  },
-  {
-   "id": "t_sb_bwy_off",
-   "type": "terminal",
-   "label": "S Broadway off",
-   "x": 520,
-   "y": 930
-  },
-  {
-   "id": "t_sb_frontage_off",
-   "type": "terminal",
-   "label": "Frontage off",
-   "x": 520,
-   "y": 990
-  },
-  {
-   "id": "t_sb_frontage_on",
-   "type": "terminal",
-   "label": "Frontage on",
-   "x": 520,
-   "y": 1050
-  },
-  {
-   "id": "nb_n",
-   "type": "terminal",
-   "label": "I-25 NB to north",
-   "x": 860,
-   "y": 20
-  },
-  {
-   "id": "nb_8th_on",
-   "type": "junction",
-   "label": "",
-   "x": 860,
-   "y": 150
-  },
-  {
-   "id": "nb_8th_off",
-   "type": "junction",
-   "label": "",
-   "x": 860,
-   "y": 250
-  },
-  {
-   "id": "nb_6th_on",
-   "type": "junction",
-   "label": "",
-   "x": 860,
-   "y": 340
-  },
-  {
-   "id": "nb_6th_off",
-   "type": "junction",
-   "label": "",
-   "x": 860,
-   "y": 440
-  },
-  {
-   "id": "nb_cedar_on",
-   "type": "junction",
-   "label": "",
-   "x": 860,
-   "y": 580
-  },
-  {
-   "id": "nb_sf_on",
-   "type": "junction",
-   "label": "",
-   "x": 860,
-   "y": 700
-  },
-  {
-   "id": "nb_sf_off",
-   "type": "junction",
-   "label": "",
-   "x": 860,
-   "y": 790
-  },
-  {
-   "id": "nb_ohio_on",
-   "type": "junction",
-   "label": "",
-   "x": 860,
-   "y": 930
-  },
-  {
-   "id": "nb_wash_on",
-   "type": "junction",
-   "label": "",
-   "x": 860,
-   "y": 990
-  },
-  {
-   "id": "nb_ohio_off",
-   "type": "junction",
-   "label": "",
-   "x": 860,
-   "y": 1050
-  },
-  {
-   "id": "nb_s",
-   "type": "terminal",
-   "label": "I-25 NB from south",
-   "x": 860,
-   "y": 1180
-  },
-  {
-   "id": "t_nb_8th_on",
-   "type": "terminal",
-   "label": "8th Ave on",
-   "x": 1040,
-   "y": 150
-  },
-  {
-   "id": "t_nb_8th_off",
-   "type": "terminal",
-   "label": "8th Ave off",
-   "x": 1040,
-   "y": 250
-  },
-  {
-   "id": "nb_6th_on_merge",
-   "type": "junction",
-   "label": "",
-   "x": 1000,
-   "y": 340
-  },
-  {
-   "id": "t_nb_6th_on_wb",
-   "type": "terminal",
-   "label": "from 6th Ave WB",
-   "x": 1140,
-   "y": 310
-  },
-  {
-   "id": "t_nb_6th_on_eb",
-   "type": "terminal",
-   "label": "from 6th Ave EB",
-   "x": 1140,
-   "y": 370
-  },
-  {
-   "id": "nb_6th_off_split",
-   "type": "junction",
-   "label": "",
-   "x": 1000,
-   "y": 440
-  },
-  {
-   "id": "t_nb_6th_off_wb",
-   "type": "terminal",
-   "label": "to 6th Ave WB",
-   "x": 1140,
-   "y": 410
-  },
-  {
-   "id": "t_nb_6th_off_eb",
-   "type": "terminal",
-   "label": "to 6th Ave EB",
-   "x": 1140,
-   "y": 470
-  },
-  {
-   "id": "t_nb_cedar_on",
-   "type": "terminal",
-   "label": "Cedar on",
-   "x": 1040,
-   "y": 580
-  },
-  {
-   "id": "t_nb_ohio_on",
-   "type": "terminal",
-   "label": "Ohio Ave on",
-   "x": 1040,
-   "y": 930
-  },
-  {
-   "id": "t_nb_wash_on",
-   "type": "terminal",
-   "label": "S Washington on",
-   "x": 1040,
-   "y": 990
-  },
-  {
-   "id": "t_nb_ohio_off",
-   "type": "terminal",
-   "label": "Ohio Ave off",
-   "x": 1040,
-   "y": 1050
-  },
-  {
-   "id": "kal_n",
-   "type": "terminal",
-   "label": "S Kalamath St (SB) from Alameda",
-   "x": 1350,
-   "y": 520
-  },
-  {
-   "id": "kal_diverge",
-   "type": "junction",
-   "label": "",
-   "x": 1350,
-   "y": 640
-  },
-  {
-   "id": "sfsb_merge",
-   "type": "junction",
-   "label": "",
-   "x": 1350,
-   "y": 790
-  },
-  {
-   "id": "sfnb_n",
-   "type": "terminal",
-   "label": "S Santa Fe Dr (NB) to Alameda",
-   "x": 1700,
-   "y": 520
-  },
-  {
-   "id": "sfnb_merge",
-   "type": "junction",
-   "label": "",
-   "x": 1700,
-   "y": 640
-  },
-  {
-   "id": "sfnb_diverge",
-   "type": "junction",
-   "label": "",
-   "x": 1700,
-   "y": 790
-  },
-  {
-   "id": "tmc_miss_w",
-   "type": "tmc",
-   "label": "S Platte River Dr (SB) @ Mississippi",
-   "x": 1350,
-   "y": 960
-  },
-  {
-   "id": "tmc_miss_e",
-   "type": "tmc",
-   "label": "Santa Fe Dr (NB) @ Mississippi",
-   "x": 1700,
-   "y": 960
-  },
-  {
-   "id": "t_miss_west",
-   "type": "terminal",
-   "label": "Mississippi Ave west",
-   "x": 1150,
-   "y": 960
-  },
-  {
-   "id": "t_miss_east",
-   "type": "terminal",
-   "label": "Mississippi Ave east",
-   "x": 1900,
-   "y": 960
-  },
-  {
-   "id": "tmc_sfsb_split",
-   "type": "tmc",
-   "label": "Santa Fe SB split (S Platte River Dr W)",
-   "x": 1350,
-   "y": 1250
-  },
-  {
-   "id": "t_platte_w",
-   "type": "terminal",
-   "label": "S Platte River Dr W",
-   "x": 1150,
-   "y": 1250
-  },
-  {
-   "id": "tmc_ariz_sb",
-   "type": "tmc",
-   "label": "Santa Fe Dr (SB) @ Arizona",
-   "x": 1350,
-   "y": 1540
-  },
-  {
-   "id": "tmc_ariz_nb",
-   "type": "tmc",
-   "label": "Santa Fe Dr (NB) @ Arizona",
-   "x": 1700,
-   "y": 1540
-  },
-  {
-   "id": "t_ariz_nb_w",
-   "type": "terminal",
-   "label": "S Platte River Dr E",
-   "x": 1500,
-   "y": 1560
-  },
-  {
-   "id": "t_ariz_nb_e",
-   "type": "terminal",
-   "label": "W Arizona Ave",
-   "x": 1900,
-   "y": 1540
-  },
-  {
-   "id": "tmc_lou_nb",
-   "type": "tmc",
-   "label": "Santa Fe Dr (NB) @ Louisiana",
-   "x": 1700,
-   "y": 1830
-  },
-  {
-   "id": "t_lou_e",
-   "type": "terminal",
-   "label": "W Louisiana Ave",
-   "x": 1900,
-   "y": 1830
-  },
-  {
-   "id": "tmc_florida",
-   "type": "tmc",
-   "label": "Santa Fe Dr @ Florida",
-   "x": 1525,
-   "y": 2120
-  },
-  {
-   "id": "t_florida_w",
-   "type": "terminal",
-   "label": "W Florida Ave west",
-   "x": 1300,
-   "y": 2120
-  },
-  {
-   "id": "t_florida_e",
-   "type": "terminal",
-   "label": "W Florida Ave east",
-   "x": 1750,
-   "y": 2120
-  },
-  {
-   "id": "t_florida_s",
-   "type": "terminal",
-   "label": "Santa Fe Dr south of Florida",
-   "x": 1525,
-   "y": 2320
-  }
- ],
- "links": [
-  {
-   "id": "i25sb_n_8th",
-   "from": "sb_n",
-   "to": "sb_8th_off",
-   "cls": "interstate",
-   "label": "SB north of 8th"
-  },
-  {
-   "id": "ramp_sb_8th_off",
-   "from": "sb_8th_off",
-   "to": "t_sb_8th_off",
-   "cls": "ramp"
-  },
-  {
-   "id": "i25sb_8th_mid",
-   "from": "sb_8th_off",
-   "to": "sb_8th_on",
-   "cls": "interstate"
-  },
-  {
-   "id": "ramp_sb_8th_on",
-   "from": "t_sb_8th_on",
-   "to": "sb_8th_on",
-   "cls": "ramp"
-  },
-  {
-   "id": "i25sb_8th_6th",
-   "from": "sb_8th_on",
-   "to": "sb_6th_off",
-   "cls": "interstate",
-   "label": "SB 8th–6th"
-  },
-  {
-   "id": "ramp_sb_6th_off",
-   "from": "sb_6th_off",
-   "to": "sb_6th_off_split",
-   "cls": "ramp",
-   "label": "6th Ave off"
-  },
-  {
-   "id": "ramp_sb_6th_off_wb",
-   "from": "sb_6th_off_split",
-   "to": "t_sb_6th_off_wb",
-   "cls": "ramp"
-  },
-  {
-   "id": "ramp_sb_6th_off_eb",
-   "from": "sb_6th_off_split",
-   "to": "t_sb_6th_off_eb",
-   "cls": "ramp"
-  },
-  {
-   "id": "i25sb_6th_mid",
-   "from": "sb_6th_off",
-   "to": "sb_6th_on",
-   "cls": "interstate"
-  },
-  {
-   "id": "ramp_sb_6th_on",
-   "from": "sb_6th_on_merge",
-   "to": "sb_6th_on",
-   "cls": "ramp",
-   "label": "6th Ave on"
-  },
-  {
-   "id": "ramp_sb_6th_on_wb",
-   "from": "t_sb_6th_on_wb",
-   "to": "sb_6th_on_merge",
-   "cls": "ramp"
-  },
-  {
-   "id": "ramp_sb_6th_on_eb",
-   "from": "t_sb_6th_on_eb",
-   "to": "sb_6th_on_merge",
-   "cls": "ramp"
-  },
-  {
-   "id": "i25sb_6th_alameda",
-   "from": "sb_6th_on",
-   "to": "sb_alameda_off",
-   "cls": "interstate",
-   "label": "SB 6th–Alameda"
-  },
-  {
-   "id": "ramp_sb_alameda_off",
-   "from": "sb_alameda_off",
-   "to": "t_sb_alameda_off",
-   "cls": "ramp"
-  },
-  {
-   "id": "i25sb_alameda_sf",
-   "from": "sb_alameda_off",
-   "to": "sb_sf_off",
-   "cls": "interstate",
-   "label": "SB Alameda–Santa Fe"
-  },
-  {
-   "id": "ramp_sb_sf_off",
-   "from": "sb_sf_off",
-   "to": "sfsb_merge",
-   "cls": "ramp",
-   "label": "Exit to Santa Fe SB",
-   "labelT": 0.15
-  },
-  {
-   "id": "i25sb_sf_mid",
-   "from": "sb_sf_off",
-   "to": "sb_sf_on",
-   "cls": "interstate"
-  },
-  {
-   "id": "ramp_sb_sf_on",
-   "from": "kal_diverge",
-   "to": "sb_sf_on",
-   "cls": "ramp",
-   "label": "Kalamath on-ramp",
-   "labelT": 0.6
-  },
-  {
-   "id": "i25sb_sf_bwy",
-   "from": "sb_sf_on",
-   "to": "sb_bwy_off",
-   "cls": "interstate",
-   "label": "SB Santa Fe–Broadway"
-  },
-  {
-   "id": "ramp_sb_bwy_off",
-   "from": "sb_bwy_off",
-   "to": "t_sb_bwy_off",
-   "cls": "ramp"
-  },
-  {
-   "id": "i25sb_bwy_mid",
-   "from": "sb_bwy_off",
-   "to": "sb_frontage_off",
-   "cls": "interstate"
-  },
-  {
-   "id": "ramp_sb_frontage_off",
-   "from": "sb_frontage_off",
-   "to": "t_sb_frontage_off",
-   "cls": "ramp"
-  },
-  {
-   "id": "i25sb_frontage_mid",
-   "from": "sb_frontage_off",
-   "to": "sb_frontage_on",
-   "cls": "interstate"
-  },
-  {
-   "id": "ramp_sb_frontage_on",
-   "from": "t_sb_frontage_on",
-   "to": "sb_frontage_on",
-   "cls": "ramp"
-  },
-  {
-   "id": "i25sb_arkansas",
-   "from": "sb_frontage_on",
-   "to": "sb_s",
-   "cls": "interstate",
-   "label": "SB at Arkansas Ave"
-  },
-  {
-   "id": "i25nb_arkansas",
-   "from": "nb_s",
-   "to": "nb_ohio_off",
-   "cls": "interstate",
-   "label": "NB at Arkansas Ave"
-  },
-  {
-   "id": "ramp_nb_ohio_off",
-   "from": "nb_ohio_off",
-   "to": "t_nb_ohio_off",
-   "cls": "ramp"
-  },
-  {
-   "id": "i25nb_ohio_wash",
-   "from": "nb_ohio_off",
-   "to": "nb_wash_on",
-   "cls": "interstate"
-  },
-  {
-   "id": "ramp_nb_wash_on",
-   "from": "t_nb_wash_on",
-   "to": "nb_wash_on",
-   "cls": "ramp"
-  },
-  {
-   "id": "i25nb_wash_ohio",
-   "from": "nb_wash_on",
-   "to": "nb_ohio_on",
-   "cls": "interstate"
-  },
-  {
-   "id": "ramp_nb_ohio_on",
-   "from": "t_nb_ohio_on",
-   "to": "nb_ohio_on",
-   "cls": "ramp"
-  },
-  {
-   "id": "i25nb_ohio_sf",
-   "from": "nb_ohio_on",
-   "to": "nb_sf_off",
-   "cls": "interstate",
-   "label": "NB Broadway–Santa Fe"
-  },
-  {
-   "id": "ramp_nb_sf_off",
-   "from": "nb_sf_off",
-   "to": "sfnb_merge",
-   "cls": "ramp",
-   "label": "Exit to Santa Fe NB",
-   "labelT": 0.35
-  },
-  {
-   "id": "i25nb_sf_mid",
-   "from": "nb_sf_off",
-   "to": "nb_sf_on",
-   "cls": "interstate"
-  },
-  {
-   "id": "ramp_nb_sf_on",
-   "from": "sfnb_diverge",
-   "to": "nb_sf_on",
-   "cls": "ramp",
-   "label": "Santa Fe on-ramp",
-   "labelT": 0.55
-  },
-  {
-   "id": "i25nb_sf_cedar",
-   "from": "nb_sf_on",
-   "to": "nb_cedar_on",
-   "cls": "interstate",
-   "label": "NB Santa Fe–Cedar"
-  },
-  {
-   "id": "ramp_nb_cedar_on",
-   "from": "t_nb_cedar_on",
-   "to": "nb_cedar_on",
-   "cls": "ramp"
-  },
-  {
-   "id": "i25nb_cedar_6th",
-   "from": "nb_cedar_on",
-   "to": "nb_6th_off",
-   "cls": "interstate",
-   "label": "NB Alameda–6th"
-  },
-  {
-   "id": "ramp_nb_6th_off",
-   "from": "nb_6th_off",
-   "to": "nb_6th_off_split",
-   "cls": "ramp",
-   "label": "6th Ave off"
-  },
-  {
-   "id": "ramp_nb_6th_off_wb",
-   "from": "nb_6th_off_split",
-   "to": "t_nb_6th_off_wb",
-   "cls": "ramp"
-  },
-  {
-   "id": "ramp_nb_6th_off_eb",
-   "from": "nb_6th_off_split",
-   "to": "t_nb_6th_off_eb",
-   "cls": "ramp"
-  },
-  {
-   "id": "i25nb_6th_mid",
-   "from": "nb_6th_off",
-   "to": "nb_6th_on",
-   "cls": "interstate"
-  },
-  {
-   "id": "ramp_nb_6th_on",
-   "from": "nb_6th_on_merge",
-   "to": "nb_6th_on",
-   "cls": "ramp",
-   "label": "6th Ave on"
-  },
-  {
-   "id": "ramp_nb_6th_on_wb",
-   "from": "t_nb_6th_on_wb",
-   "to": "nb_6th_on_merge",
-   "cls": "ramp"
-  },
-  {
-   "id": "ramp_nb_6th_on_eb",
-   "from": "t_nb_6th_on_eb",
-   "to": "nb_6th_on_merge",
-   "cls": "ramp"
-  },
-  {
-   "id": "i25nb_6th_8th",
-   "from": "nb_6th_on",
-   "to": "nb_8th_off",
-   "cls": "interstate",
-   "label": "NB 6th–8th"
-  },
-  {
-   "id": "ramp_nb_8th_off",
-   "from": "nb_8th_off",
-   "to": "t_nb_8th_off",
-   "cls": "ramp"
-  },
-  {
-   "id": "i25nb_8th_mid",
-   "from": "nb_8th_off",
-   "to": "nb_8th_on",
-   "cls": "interstate",
-   "label": "NB at 8th Ave"
-  },
-  {
-   "id": "ramp_nb_8th_on",
-   "from": "t_nb_8th_on",
-   "to": "nb_8th_on",
-   "cls": "ramp"
-  },
-  {
-   "id": "i25nb_8th_n",
-   "from": "nb_8th_on",
-   "to": "nb_n",
-   "cls": "interstate",
-   "label": "NB north of 8th"
-  },
-  {
-   "id": "kal_alameda_i25",
-   "from": "kal_n",
-   "to": "kal_diverge",
-   "cls": "street",
-   "label": "Kalamath SB at Alameda"
-  },
-  {
-   "id": "kal_mid",
-   "from": "kal_diverge",
-   "to": "sfsb_merge",
-   "cls": "street",
-   "label": "Kalamath SB under I-25"
-  },
-  {
-   "id": "sfsb_i25_miss",
-   "from": "sfsb_merge",
-   "to": "tmc_miss_w",
-   "cls": "street",
-   "label": "Santa Fe SB, I-25 to Mississippi",
-   "toLeg": "N"
-  },
-  {
-   "id": "sfnb_miss_i25",
-   "from": "tmc_miss_e",
-   "to": "sfnb_diverge",
-   "cls": "street",
-   "label": "Santa Fe NB, Mississippi to I-25",
-   "fromLeg": "N"
-  },
-  {
-   "id": "sfnb_mid",
-   "from": "sfnb_diverge",
-   "to": "sfnb_merge",
-   "cls": "street",
-   "label": "Santa Fe NB under I-25"
-  },
-  {
-   "id": "sfnb_i25_alameda",
-   "from": "sfnb_merge",
-   "to": "sfnb_n",
-   "cls": "street",
-   "label": "Santa Fe NB at Alameda"
-  },
-  {
-   "id": "miss_w_in",
-   "from": "t_miss_west",
-   "to": "tmc_miss_w",
-   "cls": "street",
-   "label": "EB approach",
-   "toLeg": "W",
-   "labelDy": 18
-  },
-  {
-   "id": "miss_w_out",
-   "from": "tmc_miss_w",
-   "to": "t_miss_west",
-   "cls": "street",
-   "label": "WB departure",
-   "fromLeg": "W",
-   "labelDy": -18
-  },
-  {
-   "id": "miss_mid_eb",
-   "from": "tmc_miss_w",
-   "to": "tmc_miss_e",
-   "cls": "street",
-   "label": "Mississippi EB mid-block",
-   "fromLeg": "E",
-   "toLeg": "W",
-   "labelDy": 14
-  },
-  {
-   "id": "miss_mid_wb",
-   "from": "tmc_miss_e",
-   "to": "tmc_miss_w",
-   "cls": "street",
-   "label": "Mississippi WB mid-block",
-   "fromLeg": "W",
-   "toLeg": "E",
-   "labelDy": -26,
-   "chipsUp": true
-  },
-  {
-   "id": "miss_e_in",
-   "from": "t_miss_east",
-   "to": "tmc_miss_e",
-   "cls": "street",
-   "label": "WB approach",
-   "toLeg": "E",
-   "labelDy": -18
-  },
-  {
-   "id": "miss_e_out",
-   "from": "tmc_miss_e",
-   "to": "t_miss_east",
-   "cls": "street",
-   "label": "EB departure",
-   "fromLeg": "E",
-   "labelDy": 18
-  },
-  {
-   "id": "sfsb_miss_split",
-   "from": "tmc_miss_w",
-   "to": "tmc_sfsb_split",
-   "cls": "street",
-   "label": "Santa Fe SB, Mississippi to split",
-   "fromLeg": "S",
-   "toLeg": "N"
-  },
-  {
-   "id": "sfsb_split_w",
-   "from": "tmc_sfsb_split",
-   "to": "t_platte_w",
-   "cls": "street",
-   "label": "to S Platte River Dr W",
-   "fromLeg": "W"
-  },
-  {
-   "id": "sfsb_split_ariz",
-   "from": "tmc_sfsb_split",
-   "to": "tmc_ariz_sb",
-   "cls": "street",
-   "label": "Santa Fe SB, split to Arizona",
-   "fromLeg": "S",
-   "toLeg": "N"
-  },
-  {
-   "id": "ariz_nb_w_in",
-   "from": "t_ariz_nb_w",
-   "to": "tmc_ariz_nb",
-   "cls": "street",
-   "toLeg": "W",
-   "labelDy": 18
-  },
-  {
-   "id": "ariz_nb_w_out",
-   "from": "tmc_ariz_nb",
-   "to": "t_ariz_nb_w",
-   "cls": "street",
-   "fromLeg": "W",
-   "labelDy": -18
-  },
-  {
-   "id": "ariz_nb_e_in",
-   "from": "t_ariz_nb_e",
-   "to": "tmc_ariz_nb",
-   "cls": "street",
-   "toLeg": "E",
-   "labelDy": -18
-  },
-  {
-   "id": "ariz_nb_e_out",
-   "from": "tmc_ariz_nb",
-   "to": "t_ariz_nb_e",
-   "cls": "street",
-   "fromLeg": "E",
-   "labelDy": 18
-  },
-  {
-   "id": "sfnb_ariz_miss",
-   "from": "tmc_ariz_nb",
-   "to": "tmc_miss_e",
-   "cls": "street",
-   "label": "Santa Fe NB, Arizona to Mississippi",
-   "fromLeg": "N",
-   "toLeg": "S"
-  },
-  {
-   "id": "lou_e_in",
-   "from": "t_lou_e",
-   "to": "tmc_lou_nb",
-   "cls": "street",
-   "toLeg": "E",
-   "labelDy": -18
-  },
-  {
-   "id": "lou_e_out",
-   "from": "tmc_lou_nb",
-   "to": "t_lou_e",
-   "cls": "street",
-   "fromLeg": "E",
-   "labelDy": 18
-  },
-  {
-   "id": "sfnb_lou_ariz",
-   "from": "tmc_lou_nb",
-   "to": "tmc_ariz_nb",
-   "cls": "street",
-   "label": "Santa Fe NB, Louisiana to Arizona",
-   "fromLeg": "N",
-   "toLeg": "S"
-  },
-  {
-   "id": "sfsb_ariz_florida",
-   "from": "tmc_ariz_sb",
-   "to": "tmc_florida",
-   "cls": "street",
-   "label": "Santa Fe SB, Arizona to Florida",
-   "fromLeg": "S",
-   "toLeg": "N"
-  },
-  {
-   "id": "sfnb_florida_lou",
-   "from": "tmc_florida",
-   "to": "tmc_lou_nb",
-   "cls": "street",
-   "label": "Santa Fe NB, Florida to Louisiana",
-   "fromLeg": "N",
-   "toLeg": "S"
-  },
-  {
-   "id": "florida_s_in",
-   "from": "t_florida_s",
-   "to": "tmc_florida",
-   "cls": "street",
-   "label": "NB from south",
-   "toLeg": "S",
-   "labelDx": 34
-  },
-  {
-   "id": "florida_s_out",
-   "from": "tmc_florida",
-   "to": "t_florida_s",
-   "cls": "street",
-   "label": "SB to south",
-   "fromLeg": "S",
-   "labelDx": -34
-  },
-  {
-   "id": "florida_w_in",
-   "from": "t_florida_w",
-   "to": "tmc_florida",
-   "cls": "street",
-   "toLeg": "W",
-   "labelDy": 18
-  },
-  {
-   "id": "florida_w_out",
-   "from": "tmc_florida",
-   "to": "t_florida_w",
-   "cls": "street",
-   "fromLeg": "W",
-   "labelDy": -18
-  },
-  {
-   "id": "florida_e_in",
-   "from": "t_florida_e",
-   "to": "tmc_florida",
-   "cls": "street",
-   "toLeg": "E",
-   "labelDy": -18
-  },
-  {
-   "id": "florida_e_out",
-   "from": "tmc_florida",
-   "to": "t_florida_e",
-   "cls": "street",
-   "fromLeg": "E",
-   "labelDy": 18
-  }
- ],
  "sources": {
   "stl_2098249": {
    "name": "StreetLight TMC 2098249 (S Platte River Dr)",
@@ -11928,6 +10563,70 @@
      }
     }
    }
+  },
+  "sprt_2026": {
+   "name": "SPRT field TMC, April 2026 (AtkinsRéalis report Fig. 36)",
+   "kind": "field_tmc",
+   "period": "Wed Apr 22, 2026 (PM peak hour 16:00-17:00)",
+   "imported": "2026-11-12",
+   "note": "South Platte River Trail Traffic Data Collection Report, draft Aug 2026, Figure 36 (report p.44). Hourly PM peak values stored as a single 15-min key '1600'; bind with bins = 1.",
+   "data": {
+    "Site 7 - W Mississippi Ave @ S Platte River Dr W": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       0,
+       0,
+       0,
+       64,
+       2462,
+       118,
+       0,
+       500,
+       335,
+       230,
+       793,
+       0
+      ]
+     }
+    },
+    "Site 8 - W Mississippi Ave @ S Santa Fe Dr": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       151,
+       1896,
+       245,
+       0,
+       0,
+       0,
+       223,
+       249,
+       0,
+       0,
+       454,
+       44
+      ]
+     }
+    },
+    "Site 37 - S Santa Fe Dr (SB) / S Platte River Dr W split": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       0,
+       0,
+       0,
+       0,
+       2631,
+       427,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ]
+     }
+    }
+   }
   }
- }
+ },
+ "defaultScenario": "base"
 }

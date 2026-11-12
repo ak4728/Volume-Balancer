@@ -11,3 +11,6 @@ tools/cache/
 Thumbs.db
 .DS_Store
 *.tmp
+
+# Reports and other documents
+*.pdf

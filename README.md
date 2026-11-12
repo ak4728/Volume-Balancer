@@ -7,7 +7,8 @@ Two standalone pages. They link to each other through the buttons in their heade
 | File | What it is |
 |---|---|
 | `volume_balance.html` | The balancing tool that replaces `AK_Volume Balance.xlsx`. Double-click to open in Edge or Chrome. No server, no internet. |
-| `network.json` | Its data: network drawing, scenarios, counts, locks, movements, imported StreetLight bins. |
+| `network.json` | The working file you open and save from the page. Currently a small from-scratch network, with the StreetLight and SPRT sources attached so its boxes can bind to them. |
+| `network_corridor.json` | The full I-25 / Santa Fe corridor network (same as the page's embedded default). Scenarios: "Baseline (5 PM)" from StreetLight and the spreadsheet, and "PM peak 4-5 PM (SPRT field counts)" where the Mississippi boxes and the SB split use the April 2026 field counts (SPRT report Fig. 36, PM peak 16:00-17:00). |
 | `corridor_map.html` | Map of the corridor: INRIX segments coloured by time of day, StreetLight intersections with movements, Replica trip origins and destinations by census tract. Needs internet for the basemap tiles and the MapLibre library only. |
 | `map_data.json` | The map's data, also embedded in the page. |
 | `tools/build_network.py` | One-time converter that produced `network.json` from the spreadsheet logic and the StreetLight CSV, and embeds a copy into the HTML. Re-run only to regenerate from scratch. |
