@@ -10569,8 +10569,98 @@
    "kind": "field_tmc",
    "period": "Wed Apr 22, 2026 (PM peak hour 16:00-17:00)",
    "imported": "2026-11-12",
-   "note": "South Platte River Trail Traffic Data Collection Report, draft Aug 2026, Figure 36 (report p.44). Hourly PM peak values stored as a single 15-min key '1600'; bind with bins = 1.",
+   "note": "South Platte River Trail Traffic Data Collection Report, draft Aug 2026, Figure 36 (report p.44 / PDF p.51). Hourly PM peak values stored under the single key '1600'; bind with bins = 1. Site 4S: the figure prints EB through 26 / EB right 448; stored as through 448 / right 26 (the figure values are evidently swapped: site 4N and site 24 both carry ~450-565 EB through).",
    "data": {
+    "Site 3 - W Mississippi Ave @ S Zuni St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       91,
+       36,
+       71,
+       9,
+       26,
+       5,
+       1,
+       388,
+       25,
+       107,
+       754,
+       6
+      ]
+     }
+    },
+    "Site 4N - W Mississippi Ave @ S Raritan St (north leg)": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       0,
+       0,
+       0,
+       7,
+       0,
+       2,
+       26,
+       448,
+       0,
+       0,
+       865,
+       18
+      ]
+     }
+    },
+    "Site 4S - W Mississippi Ave @ S Raritan St (south leg)": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       14,
+       0,
+       22,
+       0,
+       0,
+       0,
+       0,
+       448,
+       26,
+       18,
+       843,
+       0
+      ]
+     }
+    },
+    "Site 5 - W Mississippi Ave @ S Lipan St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       17,
+       143,
+       53,
+       119,
+       109,
+       66,
+       25,
+       423,
+       21,
+       35,
+       811,
+       103
+      ]
+     }
+    },
+    "Site 24 - W Mississippi Ave @ S Jason St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       21,
+       142,
+       37,
+       135,
+       60,
+       47,
+       28,
+       565,
+       12,
+       28,
+       890,
+       82
+      ]
+     }
+    },
     "Site 7 - W Mississippi Ave @ S Platte River Dr W": {
      "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
       "1600": [
@@ -10604,6 +10694,60 @@
        0,
        454,
        44
+      ]
+     }
+    },
+    "Site 34 - W Louisiana Ave @ S Zuni St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       14,
+       180,
+       20,
+       6,
+       134,
+       21,
+       19,
+       81,
+       24,
+       34,
+       90,
+       7
+      ]
+     }
+    },
+    "Site 35 - W Louisiana Ave @ S Raritan St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       6,
+       5,
+       4,
+       1,
+       6,
+       9,
+       17,
+       64,
+       4,
+       0,
+       83,
+       6
+      ]
+     }
+    },
+    "Site 36 - W Louisiana Ave @ S Jason St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       11,
+       131,
+       4,
+       4,
+       106,
+       9,
+       13,
+       7,
+       14,
+       1,
+       10,
+       15
       ]
      }
     },

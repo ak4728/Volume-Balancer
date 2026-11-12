@@ -1,7 +1,7 @@
 {
  "meta": {
   "name": "I-25 / Santa Fe Dr volume balance",
-  "description": "Built from AK_Volume Balance.xlsx (Baseline 5PM), CDOT TCDS counts and StreetLight TMC 2098249. SPRT field TMCs (Apr 2026) added as a second scenario.",
+  "description": "Built from AK_Volume Balance.xlsx (Baseline 5PM), CDOT TCDS counts and StreetLight TMC 2098249. SPRT field TMCs (Apr 2026, Fig. 36) added: a second scenario for the Santa Fe boxes, and the W Mississippi Ave (Zuni to S Platte River Dr) and W Louisiana Ave (Zuni to Jason) chains.",
   "version": 1
  },
  "settings": {
@@ -490,6 +490,102 @@
       "WBT": 12,
       "WBR": 4
      }
+    },
+    "tmc_ms_lipan": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 5 - W Mississippi Ave @ S Lipan St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36)."
+    },
+    "tmc_ms_jason": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 24 - W Mississippi Ave @ S Jason St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36)."
+    },
+    "tmc_ms_raritan_s": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 4S - W Mississippi Ave @ S Raritan St (south leg)",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36). Figure shows EB through/right swapped (26/448); stored as 448/26."
+    },
+    "tmc_ms_raritan_n": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 4N - W Mississippi Ave @ S Raritan St (north leg)",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36)."
+    },
+    "tmc_ms_zuni": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 3 - W Mississippi Ave @ S Zuni St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36)."
+    },
+    "tmc_lou_jason": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 36 - W Louisiana Ave @ S Jason St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36)."
+    },
+    "tmc_lou_raritan": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 35 - W Louisiana Ave @ S Raritan St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36)."
+    },
+    "tmc_lou_zuni": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 34 - W Louisiana Ave @ S Zuni St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36)."
     }
    }
   },
@@ -981,6 +1077,102 @@
       "WBT": 12,
       "WBR": 4
      }
+    },
+    "tmc_ms_lipan": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 5 - W Mississippi Ave @ S Lipan St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36)."
+    },
+    "tmc_ms_jason": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 24 - W Mississippi Ave @ S Jason St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36)."
+    },
+    "tmc_ms_raritan_s": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 4S - W Mississippi Ave @ S Raritan St (south leg)",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36). Figure shows EB through/right swapped (26/448); stored as 448/26."
+    },
+    "tmc_ms_raritan_n": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 4N - W Mississippi Ave @ S Raritan St (north leg)",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36)."
+    },
+    "tmc_ms_zuni": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 3 - W Mississippi Ave @ S Zuni St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36)."
+    },
+    "tmc_lou_jason": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 36 - W Louisiana Ave @ S Jason St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36)."
+    },
+    "tmc_lou_raritan": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 35 - W Louisiana Ave @ S Raritan St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36)."
+    },
+    "tmc_lou_zuni": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 34 - W Louisiana Ave @ S Zuni St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36)."
     }
    }
   }
@@ -1379,13 +1571,6 @@
    "y": 960
   },
   {
-   "id": "t_miss_west",
-   "type": "terminal",
-   "label": "Mississippi Ave west",
-   "x": 1150,
-   "y": 960
-  },
-  {
    "id": "t_miss_east",
    "type": "terminal",
    "label": "Mississippi Ave east",
@@ -1475,6 +1660,181 @@
    "label": "Santa Fe Dr south of Florida",
    "x": 1525,
    "y": 2320
+  },
+  {
+   "id": "tmc_ms_lipan",
+   "type": "tmc",
+   "label": "Mississippi @ S Lipan St",
+   "x": 1000,
+   "y": 1450
+  },
+  {
+   "id": "t_tmc_ms_lipan_n",
+   "type": "terminal",
+   "label": "S Lipan St north",
+   "x": 1000,
+   "y": 1250
+  },
+  {
+   "id": "t_tmc_ms_lipan_s",
+   "type": "terminal",
+   "label": "S Lipan St south",
+   "x": 1000,
+   "y": 1650
+  },
+  {
+   "id": "tmc_ms_jason",
+   "type": "tmc",
+   "label": "Mississippi @ S Jason St",
+   "x": 680,
+   "y": 1450
+  },
+  {
+   "id": "t_tmc_ms_jason_n",
+   "type": "terminal",
+   "label": "S Jason St north",
+   "x": 680,
+   "y": 1250
+  },
+  {
+   "id": "t_tmc_ms_jason_s",
+   "type": "terminal",
+   "label": "S Jason St south",
+   "x": 680,
+   "y": 1650
+  },
+  {
+   "id": "tmc_ms_raritan_s",
+   "type": "tmc",
+   "label": "Mississippi @ S Raritan St (south leg)",
+   "x": 360,
+   "y": 1450
+  },
+  {
+   "id": "t_tmc_ms_raritan_s_s",
+   "type": "terminal",
+   "label": "S Raritan St south",
+   "x": 360,
+   "y": 1650
+  },
+  {
+   "id": "tmc_ms_raritan_n",
+   "type": "tmc",
+   "label": "Mississippi @ S Raritan St (north leg)",
+   "x": 40,
+   "y": 1450
+  },
+  {
+   "id": "t_tmc_ms_raritan_n_n",
+   "type": "terminal",
+   "label": "S Raritan St north",
+   "x": 40,
+   "y": 1250
+  },
+  {
+   "id": "tmc_ms_zuni",
+   "type": "tmc",
+   "label": "Mississippi @ S Zuni St",
+   "x": -280,
+   "y": 1450
+  },
+  {
+   "id": "t_tmc_ms_zuni_n",
+   "type": "terminal",
+   "label": "S Zuni St north",
+   "x": -280,
+   "y": 1250
+  },
+  {
+   "id": "t_tmc_ms_zuni_s",
+   "type": "terminal",
+   "label": "S Zuni St south",
+   "x": -280,
+   "y": 1650
+  },
+  {
+   "id": "t_ms_west",
+   "type": "terminal",
+   "label": "W Mississippi Ave west of Zuni",
+   "x": -560,
+   "y": 1450
+  },
+  {
+   "id": "tmc_lou_jason",
+   "type": "tmc",
+   "label": "Louisiana @ S Jason St",
+   "x": 680,
+   "y": 1950
+  },
+  {
+   "id": "t_tmc_lou_jason_n",
+   "type": "terminal",
+   "label": "S Jason St north",
+   "x": 680,
+   "y": 1750
+  },
+  {
+   "id": "t_tmc_lou_jason_s",
+   "type": "terminal",
+   "label": "S Jason St south",
+   "x": 680,
+   "y": 2150
+  },
+  {
+   "id": "tmc_lou_raritan",
+   "type": "tmc",
+   "label": "Louisiana @ S Raritan St",
+   "x": 360,
+   "y": 1950
+  },
+  {
+   "id": "t_tmc_lou_raritan_n",
+   "type": "terminal",
+   "label": "S Raritan St north",
+   "x": 360,
+   "y": 1750
+  },
+  {
+   "id": "t_tmc_lou_raritan_s",
+   "type": "terminal",
+   "label": "S Raritan St south",
+   "x": 360,
+   "y": 2150
+  },
+  {
+   "id": "tmc_lou_zuni",
+   "type": "tmc",
+   "label": "Louisiana @ S Zuni St",
+   "x": -280,
+   "y": 1950
+  },
+  {
+   "id": "t_tmc_lou_zuni_n",
+   "type": "terminal",
+   "label": "S Zuni St north",
+   "x": -280,
+   "y": 1750
+  },
+  {
+   "id": "t_tmc_lou_zuni_s",
+   "type": "terminal",
+   "label": "S Zuni St south",
+   "x": -280,
+   "y": 2150
+  },
+  {
+   "id": "t_lou_w_east",
+   "type": "terminal",
+   "label": "W Louisiana Ave east of Jason",
+   "x": 1000,
+   "y": 1950
+  },
+  {
+   "id": "t_lou_west",
+   "type": "terminal",
+   "label": "W Louisiana Ave west of Zuni",
+   "x": -560,
+   "y": 1950
   }
  ],
  "links": [
@@ -1848,24 +2208,6 @@
    "label": "Santa Fe NB at Alameda"
   },
   {
-   "id": "miss_w_in",
-   "from": "t_miss_west",
-   "to": "tmc_miss_w",
-   "cls": "street",
-   "label": "EB approach",
-   "toLeg": "W",
-   "labelDy": 18
-  },
-  {
-   "id": "miss_w_out",
-   "from": "tmc_miss_w",
-   "to": "t_miss_west",
-   "cls": "street",
-   "label": "WB departure",
-   "fromLeg": "W",
-   "labelDy": -18
-  },
-  {
    "id": "miss_mid_eb",
    "from": "tmc_miss_w",
    "to": "tmc_miss_e",
@@ -2063,6 +2405,431 @@
    "cls": "street",
    "fromLeg": "E",
    "labelDy": 18
+  },
+  {
+   "id": "tmc_ms_lipan_n_in",
+   "from": "t_tmc_ms_lipan_n",
+   "to": "tmc_ms_lipan",
+   "cls": "street",
+   "toLeg": "N",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_ms_lipan_n_out",
+   "from": "tmc_ms_lipan",
+   "to": "t_tmc_ms_lipan_n",
+   "cls": "street",
+   "fromLeg": "N",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_ms_lipan_s_in",
+   "from": "t_tmc_ms_lipan_s",
+   "to": "tmc_ms_lipan",
+   "cls": "street",
+   "toLeg": "S",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_ms_lipan_s_out",
+   "from": "tmc_ms_lipan",
+   "to": "t_tmc_ms_lipan_s",
+   "cls": "street",
+   "fromLeg": "S",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_ms_jason_n_in",
+   "from": "t_tmc_ms_jason_n",
+   "to": "tmc_ms_jason",
+   "cls": "street",
+   "toLeg": "N",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_ms_jason_n_out",
+   "from": "tmc_ms_jason",
+   "to": "t_tmc_ms_jason_n",
+   "cls": "street",
+   "fromLeg": "N",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_ms_jason_s_in",
+   "from": "t_tmc_ms_jason_s",
+   "to": "tmc_ms_jason",
+   "cls": "street",
+   "toLeg": "S",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_ms_jason_s_out",
+   "from": "tmc_ms_jason",
+   "to": "t_tmc_ms_jason_s",
+   "cls": "street",
+   "fromLeg": "S",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_ms_raritan_s_s_in",
+   "from": "t_tmc_ms_raritan_s_s",
+   "to": "tmc_ms_raritan_s",
+   "cls": "street",
+   "toLeg": "S",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_ms_raritan_s_s_out",
+   "from": "tmc_ms_raritan_s",
+   "to": "t_tmc_ms_raritan_s_s",
+   "cls": "street",
+   "fromLeg": "S",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_ms_raritan_n_n_in",
+   "from": "t_tmc_ms_raritan_n_n",
+   "to": "tmc_ms_raritan_n",
+   "cls": "street",
+   "toLeg": "N",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_ms_raritan_n_n_out",
+   "from": "tmc_ms_raritan_n",
+   "to": "t_tmc_ms_raritan_n_n",
+   "cls": "street",
+   "fromLeg": "N",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_ms_zuni_n_in",
+   "from": "t_tmc_ms_zuni_n",
+   "to": "tmc_ms_zuni",
+   "cls": "street",
+   "toLeg": "N",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_ms_zuni_n_out",
+   "from": "tmc_ms_zuni",
+   "to": "t_tmc_ms_zuni_n",
+   "cls": "street",
+   "fromLeg": "N",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_ms_zuni_s_in",
+   "from": "t_tmc_ms_zuni_s",
+   "to": "tmc_ms_zuni",
+   "cls": "street",
+   "toLeg": "S",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_ms_zuni_s_out",
+   "from": "tmc_ms_zuni",
+   "to": "t_tmc_ms_zuni_s",
+   "cls": "street",
+   "fromLeg": "S",
+   "labelDx": -30
+  },
+  {
+   "id": "ms_lipan_platte_eb",
+   "from": "tmc_ms_lipan",
+   "to": "tmc_miss_w",
+   "cls": "street",
+   "label": "Mississippi EB, Lipan to S Platte River Dr",
+   "fromLeg": "E",
+   "toLeg": "W",
+   "labelDy": 14
+  },
+  {
+   "id": "ms_lipan_platte_wb",
+   "from": "tmc_miss_w",
+   "to": "tmc_ms_lipan",
+   "cls": "street",
+   "label": "Mississippi WB, S Platte River Dr to Lipan",
+   "fromLeg": "W",
+   "toLeg": "E",
+   "labelDy": -26,
+   "chipsUp": true
+  },
+  {
+   "id": "ms_jason_lipan_eb",
+   "from": "tmc_ms_jason",
+   "to": "tmc_ms_lipan",
+   "cls": "street",
+   "label": "Mississippi EB, Jason to Lipan",
+   "fromLeg": "E",
+   "toLeg": "W",
+   "labelDy": 14
+  },
+  {
+   "id": "ms_lipan_jason_wb",
+   "from": "tmc_ms_lipan",
+   "to": "tmc_ms_jason",
+   "cls": "street",
+   "label": "Mississippi WB, Lipan to Jason",
+   "fromLeg": "W",
+   "toLeg": "E",
+   "labelDy": -26,
+   "chipsUp": true
+  },
+  {
+   "id": "ms_raritan_s_jason_eb",
+   "from": "tmc_ms_raritan_s",
+   "to": "tmc_ms_jason",
+   "cls": "street",
+   "label": "Mississippi EB, Raritan S to Jason",
+   "fromLeg": "E",
+   "toLeg": "W",
+   "labelDy": 14
+  },
+  {
+   "id": "ms_jason_raritan_s_wb",
+   "from": "tmc_ms_jason",
+   "to": "tmc_ms_raritan_s",
+   "cls": "street",
+   "label": "Mississippi WB, Jason to Raritan S",
+   "fromLeg": "W",
+   "toLeg": "E",
+   "labelDy": -26,
+   "chipsUp": true
+  },
+  {
+   "id": "ms_raritan_n_raritan_s_eb",
+   "from": "tmc_ms_raritan_n",
+   "to": "tmc_ms_raritan_s",
+   "cls": "street",
+   "label": "Mississippi EB, Raritan N to Raritan S",
+   "fromLeg": "E",
+   "toLeg": "W",
+   "labelDy": 14
+  },
+  {
+   "id": "ms_raritan_s_raritan_n_wb",
+   "from": "tmc_ms_raritan_s",
+   "to": "tmc_ms_raritan_n",
+   "cls": "street",
+   "label": "Mississippi WB, Raritan S to Raritan N",
+   "fromLeg": "W",
+   "toLeg": "E",
+   "labelDy": -26,
+   "chipsUp": true
+  },
+  {
+   "id": "ms_zuni_raritan_n_eb",
+   "from": "tmc_ms_zuni",
+   "to": "tmc_ms_raritan_n",
+   "cls": "street",
+   "label": "Mississippi EB, Zuni to Raritan N",
+   "fromLeg": "E",
+   "toLeg": "W",
+   "labelDy": 14
+  },
+  {
+   "id": "ms_raritan_n_zuni_wb",
+   "from": "tmc_ms_raritan_n",
+   "to": "tmc_ms_zuni",
+   "cls": "street",
+   "label": "Mississippi WB, Raritan N to Zuni",
+   "fromLeg": "W",
+   "toLeg": "E",
+   "labelDy": -26,
+   "chipsUp": true
+  },
+  {
+   "id": "ms_west_in",
+   "from": "t_ms_west",
+   "to": "tmc_ms_zuni",
+   "cls": "street",
+   "label": "Mississippi EB from west",
+   "toLeg": "W",
+   "labelDy": 14
+  },
+  {
+   "id": "ms_west_out",
+   "from": "tmc_ms_zuni",
+   "to": "t_ms_west",
+   "cls": "street",
+   "label": "Mississippi WB to west",
+   "fromLeg": "W",
+   "labelDy": -14
+  },
+  {
+   "id": "tmc_lou_jason_n_in",
+   "from": "t_tmc_lou_jason_n",
+   "to": "tmc_lou_jason",
+   "cls": "street",
+   "toLeg": "N",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_lou_jason_n_out",
+   "from": "tmc_lou_jason",
+   "to": "t_tmc_lou_jason_n",
+   "cls": "street",
+   "fromLeg": "N",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_lou_jason_s_in",
+   "from": "t_tmc_lou_jason_s",
+   "to": "tmc_lou_jason",
+   "cls": "street",
+   "toLeg": "S",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_lou_jason_s_out",
+   "from": "tmc_lou_jason",
+   "to": "t_tmc_lou_jason_s",
+   "cls": "street",
+   "fromLeg": "S",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_lou_raritan_n_in",
+   "from": "t_tmc_lou_raritan_n",
+   "to": "tmc_lou_raritan",
+   "cls": "street",
+   "toLeg": "N",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_lou_raritan_n_out",
+   "from": "tmc_lou_raritan",
+   "to": "t_tmc_lou_raritan_n",
+   "cls": "street",
+   "fromLeg": "N",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_lou_raritan_s_in",
+   "from": "t_tmc_lou_raritan_s",
+   "to": "tmc_lou_raritan",
+   "cls": "street",
+   "toLeg": "S",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_lou_raritan_s_out",
+   "from": "tmc_lou_raritan",
+   "to": "t_tmc_lou_raritan_s",
+   "cls": "street",
+   "fromLeg": "S",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_lou_zuni_n_in",
+   "from": "t_tmc_lou_zuni_n",
+   "to": "tmc_lou_zuni",
+   "cls": "street",
+   "toLeg": "N",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_lou_zuni_n_out",
+   "from": "tmc_lou_zuni",
+   "to": "t_tmc_lou_zuni_n",
+   "cls": "street",
+   "fromLeg": "N",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_lou_zuni_s_in",
+   "from": "t_tmc_lou_zuni_s",
+   "to": "tmc_lou_zuni",
+   "cls": "street",
+   "toLeg": "S",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_lou_zuni_s_out",
+   "from": "tmc_lou_zuni",
+   "to": "t_tmc_lou_zuni_s",
+   "cls": "street",
+   "fromLeg": "S",
+   "labelDx": -30
+  },
+  {
+   "id": "lou_jason_east_out",
+   "from": "tmc_lou_jason",
+   "to": "t_lou_w_east",
+   "cls": "street",
+   "label": "Louisiana EB to east",
+   "fromLeg": "E",
+   "labelDy": 14
+  },
+  {
+   "id": "lou_jason_east_in",
+   "from": "t_lou_w_east",
+   "to": "tmc_lou_jason",
+   "cls": "street",
+   "label": "Louisiana WB from east",
+   "toLeg": "E",
+   "labelDy": -14
+  },
+  {
+   "id": "lou_raritan_jason_eb",
+   "from": "tmc_lou_raritan",
+   "to": "tmc_lou_jason",
+   "cls": "street",
+   "label": "Louisiana EB, Raritan to Jason",
+   "fromLeg": "E",
+   "toLeg": "W",
+   "labelDy": 14
+  },
+  {
+   "id": "lou_jason_raritan_wb",
+   "from": "tmc_lou_jason",
+   "to": "tmc_lou_raritan",
+   "cls": "street",
+   "label": "Louisiana WB, Jason to Raritan",
+   "fromLeg": "W",
+   "toLeg": "E",
+   "labelDy": -26,
+   "chipsUp": true
+  },
+  {
+   "id": "lou_zuni_raritan_eb",
+   "from": "tmc_lou_zuni",
+   "to": "tmc_lou_raritan",
+   "cls": "street",
+   "label": "Louisiana EB, Zuni to Raritan",
+   "fromLeg": "E",
+   "toLeg": "W",
+   "labelDy": 14
+  },
+  {
+   "id": "lou_raritan_zuni_wb",
+   "from": "tmc_lou_raritan",
+   "to": "tmc_lou_zuni",
+   "cls": "street",
+   "label": "Louisiana WB, Raritan to Zuni",
+   "fromLeg": "W",
+   "toLeg": "E",
+   "labelDy": -26,
+   "chipsUp": true
+  },
+  {
+   "id": "lou_west_in",
+   "from": "t_lou_west",
+   "to": "tmc_lou_zuni",
+   "cls": "street",
+   "label": "Louisiana EB from west",
+   "toLeg": "W",
+   "labelDy": 14
+  },
+  {
+   "id": "lou_west_out",
+   "from": "tmc_lou_zuni",
+   "to": "t_lou_west",
+   "cls": "street",
+   "label": "Louisiana WB to west",
+   "fromLeg": "W",
+   "labelDy": -14
   }
  ],
  "sources": {
@@ -12425,8 +13192,98 @@
    "kind": "field_tmc",
    "period": "Wed Apr 22, 2026 (PM peak hour 16:00-17:00)",
    "imported": "2026-11-12",
-   "note": "South Platte River Trail Traffic Data Collection Report, draft Aug 2026, Figure 36 (report p.44). Hourly PM peak values stored as a single 15-min key '1600'; bind with bins = 1.",
+   "note": "South Platte River Trail Traffic Data Collection Report, draft Aug 2026, Figure 36 (report p.44 / PDF p.51). Hourly PM peak values stored under the single key '1600'; bind with bins = 1. Site 4S: the figure prints EB through 26 / EB right 448; stored as through 448 / right 26 (the figure values are evidently swapped: site 4N and site 24 both carry ~450-565 EB through).",
    "data": {
+    "Site 3 - W Mississippi Ave @ S Zuni St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       91,
+       36,
+       71,
+       9,
+       26,
+       5,
+       1,
+       388,
+       25,
+       107,
+       754,
+       6
+      ]
+     }
+    },
+    "Site 4N - W Mississippi Ave @ S Raritan St (north leg)": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       0,
+       0,
+       0,
+       7,
+       0,
+       2,
+       26,
+       448,
+       0,
+       0,
+       865,
+       18
+      ]
+     }
+    },
+    "Site 4S - W Mississippi Ave @ S Raritan St (south leg)": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       14,
+       0,
+       22,
+       0,
+       0,
+       0,
+       0,
+       448,
+       26,
+       18,
+       843,
+       0
+      ]
+     }
+    },
+    "Site 5 - W Mississippi Ave @ S Lipan St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       17,
+       143,
+       53,
+       119,
+       109,
+       66,
+       25,
+       423,
+       21,
+       35,
+       811,
+       103
+      ]
+     }
+    },
+    "Site 24 - W Mississippi Ave @ S Jason St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       21,
+       142,
+       37,
+       135,
+       60,
+       47,
+       28,
+       565,
+       12,
+       28,
+       890,
+       82
+      ]
+     }
+    },
     "Site 7 - W Mississippi Ave @ S Platte River Dr W": {
      "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
       "1600": [
@@ -12460,6 +13317,60 @@
        0,
        454,
        44
+      ]
+     }
+    },
+    "Site 34 - W Louisiana Ave @ S Zuni St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       14,
+       180,
+       20,
+       6,
+       134,
+       21,
+       19,
+       81,
+       24,
+       34,
+       90,
+       7
+      ]
+     }
+    },
+    "Site 35 - W Louisiana Ave @ S Raritan St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       6,
+       5,
+       4,
+       1,
+       6,
+       9,
+       17,
+       64,
+       4,
+       0,
+       83,
+       6
+      ]
+     }
+    },
+    "Site 36 - W Louisiana Ave @ S Jason St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       11,
+       131,
+       4,
+       4,
+       106,
+       9,
+       13,
+       7,
+       14,
+       1,
+       10,
+       15
       ]
      }
     },
