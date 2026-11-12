@@ -1,7 +1,7 @@
 {
  "meta": {
   "name": "I-25 / Santa Fe Dr volume balance",
-  "description": "Built from AK_Volume Balance.xlsx (Baseline 5PM), CDOT TCDS counts and StreetLight TMC 2098249. SPRT field TMCs (Apr 2026, Fig. 36) added: a second scenario for the Santa Fe boxes, and the W Mississippi Ave (Zuni to S Platte River Dr) and W Louisiana Ave (Zuni to Jason) chains, joined by S Zuni, S Raritan and S Jason St.",
+  "description": "Built from AK_Volume Balance.xlsx (Baseline 5PM), CDOT TCDS counts and StreetLight TMC 2098249. SPRT field TMCs (Apr 2026, Fig. 36) added: a second scenario for the Santa Fe boxes, and the W Mississippi Ave (Zuni to S Platte River Dr) and W Louisiana Ave (Zuni to Jason) chains, joined by S Zuni, S Raritan and S Jason St; W Florida Ave (Zuni to Santa Fe) added from Fig. 37, joined by S Zuni St and S Platte River Dr W.",
   "version": 1
  },
  "settings": {
@@ -342,6 +342,28 @@
      ],
      "mode": "derive",
      "note": "Spreadsheet BZ46 derives this and compares with the 2020 count."
+    },
+    "florida_s_out": {
+     "observed": [
+      {
+       "source": "SPRT Iowa Ave",
+       "date": "2026-04-22",
+       "value": 2802,
+       "growth": false
+      }
+     ],
+     "mode": "derive"
+    },
+    "florida_s_in": {
+     "observed": [
+      {
+       "source": "SPRT Iowa Ave",
+       "date": "2026-04-22",
+       "value": 2646,
+       "growth": false
+      }
+     ],
+     "mode": "derive"
     }
    },
    "tmc": {
@@ -586,6 +608,66 @@
      },
      "overrides": {},
      "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36)."
+    },
+    "tmc_fl_zuni": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 6 - W Florida Ave @ S Zuni St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 37)."
+    },
+    "tmc_fl_raritan": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 21 - W Florida Ave @ S Raritan St (south leg)",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 37)."
+    },
+    "tmc_fl_osage": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 33 - W Florida Ave @ S Osage St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 37)."
+    },
+    "tmc_fl_lipan": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 27 - W Florida Ave @ S Lipan St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 37)."
+    },
+    "tmc_fl_platte": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 18 - W Florida Ave @ S Platte River Dr",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 37)."
     }
    }
   },
@@ -919,6 +1001,28 @@
      ],
      "mode": "derive",
      "note": "Spreadsheet BZ46 derives this and compares with the 2020 count."
+    },
+    "florida_s_out": {
+     "observed": [
+      {
+       "source": "SPRT Iowa Ave",
+       "date": "2026-04-22",
+       "value": 2802,
+       "growth": false
+      }
+     ],
+     "mode": "derive"
+    },
+    "florida_s_in": {
+     "observed": [
+      {
+       "source": "SPRT Iowa Ave",
+       "date": "2026-04-22",
+       "value": 2646,
+       "growth": false
+      }
+     ],
+     "mode": "derive"
     }
    },
    "tmc": {
@@ -1060,8 +1164,11 @@
     },
     "tmc_florida": {
      "source": {
-      "id": "stl_2098249",
-      "intersection": "Florida"
+      "id": "sprt_2026",
+      "intersection": "Site 17 - W Florida Ave @ S Santa Fe Dr",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
      },
      "movements": {
       "NBL": 125,
@@ -1076,7 +1183,9 @@
       "WBL": 22,
       "WBT": 12,
       "WBR": 4
-     }
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 37)."
     },
     "tmc_lou_jason": {
      "movements": {},
@@ -1173,6 +1282,66 @@
      },
      "overrides": {},
      "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 36)."
+    },
+    "tmc_fl_zuni": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 6 - W Florida Ave @ S Zuni St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 37)."
+    },
+    "tmc_fl_raritan": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 21 - W Florida Ave @ S Raritan St (south leg)",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 37)."
+    },
+    "tmc_fl_osage": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 33 - W Florida Ave @ S Osage St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 37)."
+    },
+    "tmc_fl_lipan": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 27 - W Florida Ave @ S Lipan St",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 37)."
+    },
+    "tmc_fl_platte": {
+     "movements": {},
+     "source": {
+      "id": "sprt_2026",
+      "intersection": "Site 18 - W Florida Ave @ S Platte River Dr",
+      "dayType": "PM peak 16:00-17:00 (field count, Wed 2026-04-22)",
+      "start": "1600",
+      "bins": 1
+     },
+     "overrides": {},
+     "note": "Field count PM peak 16:00-17:00, Wed 2026-04-22 (SPRT report Fig. 37)."
     }
    }
   }
@@ -1585,13 +1754,6 @@
    "y": 1250
   },
   {
-   "id": "t_platte_w",
-   "type": "terminal",
-   "label": "S Platte River Dr W",
-   "x": 1150,
-   "y": 1250
-  },
-  {
    "id": "tmc_ariz_sb",
    "type": "tmc",
    "label": "Santa Fe Dr (SB) @ Arizona",
@@ -1637,29 +1799,22 @@
    "id": "tmc_florida",
    "type": "tmc",
    "label": "Santa Fe Dr @ Florida",
-   "x": 1525,
-   "y": 2120
-  },
-  {
-   "id": "t_florida_w",
-   "type": "terminal",
-   "label": "W Florida Ave west",
-   "x": 1300,
-   "y": 2120
+   "x": 1700,
+   "y": 2450
   },
   {
    "id": "t_florida_e",
    "type": "terminal",
    "label": "W Florida Ave east",
-   "x": 1750,
-   "y": 2120
+   "x": 1900,
+   "y": 2450
   },
   {
    "id": "t_florida_s",
    "type": "terminal",
    "label": "Santa Fe Dr south of Florida",
-   "x": 1525,
-   "y": 2320
+   "x": 1700,
+   "y": 2650
   },
   {
    "id": "tmc_lou_jason",
@@ -1695,13 +1850,6 @@
    "label": "Louisiana @ S Zuni St",
    "x": -280,
    "y": 1950
-  },
-  {
-   "id": "t_tmc_lou_zuni_s",
-   "type": "terminal",
-   "label": "S Zuni St south",
-   "x": -280,
-   "y": 2150
   },
   {
    "id": "t_lou_w_east",
@@ -1793,6 +1941,104 @@
    "label": "W Mississippi Ave west of Zuni",
    "x": -560,
    "y": 1450
+  },
+  {
+   "id": "tmc_fl_zuni",
+   "type": "tmc",
+   "label": "Florida @ S Zuni St",
+   "x": -280,
+   "y": 2450
+  },
+  {
+   "id": "t_tmc_fl_zuni_s",
+   "type": "terminal",
+   "label": "S Zuni St south",
+   "x": -280,
+   "y": 2650
+  },
+  {
+   "id": "tmc_fl_raritan",
+   "type": "tmc",
+   "label": "Florida @ S Raritan St (south leg)",
+   "x": 360,
+   "y": 2450
+  },
+  {
+   "id": "t_tmc_fl_raritan_s",
+   "type": "terminal",
+   "label": "S Raritan St south",
+   "x": 360,
+   "y": 2650
+  },
+  {
+   "id": "tmc_fl_osage",
+   "type": "tmc",
+   "label": "Florida @ S Osage St",
+   "x": 680,
+   "y": 2450
+  },
+  {
+   "id": "t_tmc_fl_osage_n",
+   "type": "terminal",
+   "label": "S Osage St north",
+   "x": 680,
+   "y": 2250
+  },
+  {
+   "id": "t_tmc_fl_osage_s",
+   "type": "terminal",
+   "label": "S Osage St south",
+   "x": 680,
+   "y": 2650
+  },
+  {
+   "id": "tmc_fl_lipan",
+   "type": "tmc",
+   "label": "Florida @ S Lipan St",
+   "x": 1000,
+   "y": 2450
+  },
+  {
+   "id": "t_tmc_fl_lipan_n",
+   "type": "terminal",
+   "label": "S Lipan St north",
+   "x": 1000,
+   "y": 2250
+  },
+  {
+   "id": "t_tmc_fl_lipan_s",
+   "type": "terminal",
+   "label": "S Lipan St south",
+   "x": 1000,
+   "y": 2650
+  },
+  {
+   "id": "tmc_fl_platte",
+   "type": "tmc",
+   "label": "Florida @ S Platte River Dr",
+   "x": 1320,
+   "y": 2450
+  },
+  {
+   "id": "t_tmc_fl_platte_s",
+   "type": "terminal",
+   "label": "S Platte River Dr south",
+   "x": 1320,
+   "y": 2650
+  },
+  {
+   "id": "t_fl_west",
+   "type": "terminal",
+   "label": "W Florida Ave west of Zuni",
+   "x": -560,
+   "y": 2450
+  },
+  {
+   "id": "t_platte_w_nb",
+   "type": "terminal",
+   "label": "S Platte River Dr W NB north of Florida",
+   "x": 1180,
+   "y": 2250
   }
  ],
  "links": [
@@ -2214,14 +2460,6 @@
    "toLeg": "N"
   },
   {
-   "id": "sfsb_split_w",
-   "from": "tmc_sfsb_split",
-   "to": "t_platte_w",
-   "cls": "street",
-   "label": "to S Platte River Dr W",
-   "fromLeg": "W"
-  },
-  {
    "id": "sfsb_split_ariz",
    "from": "tmc_sfsb_split",
    "to": "tmc_ariz_sb",
@@ -2333,22 +2571,6 @@
    "labelDx": -34
   },
   {
-   "id": "florida_w_in",
-   "from": "t_florida_w",
-   "to": "tmc_florida",
-   "cls": "street",
-   "toLeg": "W",
-   "labelDy": 18
-  },
-  {
-   "id": "florida_w_out",
-   "from": "tmc_florida",
-   "to": "t_florida_w",
-   "cls": "street",
-   "fromLeg": "W",
-   "labelDy": -18
-  },
-  {
    "id": "florida_e_in",
    "from": "t_florida_e",
    "to": "tmc_florida",
@@ -2392,22 +2614,6 @@
    "id": "tmc_lou_raritan_s_out",
    "from": "tmc_lou_raritan",
    "to": "t_tmc_lou_raritan_s",
-   "cls": "street",
-   "fromLeg": "S",
-   "labelDx": -30
-  },
-  {
-   "id": "tmc_lou_zuni_s_in",
-   "from": "t_tmc_lou_zuni_s",
-   "to": "tmc_lou_zuni",
-   "cls": "street",
-   "toLeg": "S",
-   "labelDx": 30
-  },
-  {
-   "id": "tmc_lou_zuni_s_out",
-   "from": "tmc_lou_zuni",
-   "to": "t_tmc_lou_zuni_s",
    "cls": "street",
    "fromLeg": "S",
    "labelDx": -30
@@ -2751,6 +2957,281 @@
    "label": "S Jason St NB, Louisiana to Mississippi",
    "fromLeg": "N",
    "toLeg": "S",
+   "labelDx": 34
+  },
+  {
+   "id": "tmc_fl_zuni_s_in",
+   "from": "t_tmc_fl_zuni_s",
+   "to": "tmc_fl_zuni",
+   "cls": "street",
+   "toLeg": "S",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_fl_zuni_s_out",
+   "from": "tmc_fl_zuni",
+   "to": "t_tmc_fl_zuni_s",
+   "cls": "street",
+   "fromLeg": "S",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_fl_raritan_s_in",
+   "from": "t_tmc_fl_raritan_s",
+   "to": "tmc_fl_raritan",
+   "cls": "street",
+   "toLeg": "S",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_fl_raritan_s_out",
+   "from": "tmc_fl_raritan",
+   "to": "t_tmc_fl_raritan_s",
+   "cls": "street",
+   "fromLeg": "S",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_fl_osage_n_in",
+   "from": "t_tmc_fl_osage_n",
+   "to": "tmc_fl_osage",
+   "cls": "street",
+   "toLeg": "N",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_fl_osage_n_out",
+   "from": "tmc_fl_osage",
+   "to": "t_tmc_fl_osage_n",
+   "cls": "street",
+   "fromLeg": "N",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_fl_osage_s_in",
+   "from": "t_tmc_fl_osage_s",
+   "to": "tmc_fl_osage",
+   "cls": "street",
+   "toLeg": "S",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_fl_osage_s_out",
+   "from": "tmc_fl_osage",
+   "to": "t_tmc_fl_osage_s",
+   "cls": "street",
+   "fromLeg": "S",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_fl_lipan_n_in",
+   "from": "t_tmc_fl_lipan_n",
+   "to": "tmc_fl_lipan",
+   "cls": "street",
+   "toLeg": "N",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_fl_lipan_n_out",
+   "from": "tmc_fl_lipan",
+   "to": "t_tmc_fl_lipan_n",
+   "cls": "street",
+   "fromLeg": "N",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_fl_lipan_s_in",
+   "from": "t_tmc_fl_lipan_s",
+   "to": "tmc_fl_lipan",
+   "cls": "street",
+   "toLeg": "S",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_fl_lipan_s_out",
+   "from": "tmc_fl_lipan",
+   "to": "t_tmc_fl_lipan_s",
+   "cls": "street",
+   "fromLeg": "S",
+   "labelDx": -30
+  },
+  {
+   "id": "tmc_fl_platte_s_in",
+   "from": "t_tmc_fl_platte_s",
+   "to": "tmc_fl_platte",
+   "cls": "street",
+   "toLeg": "S",
+   "labelDx": 30
+  },
+  {
+   "id": "tmc_fl_platte_s_out",
+   "from": "tmc_fl_platte",
+   "to": "t_tmc_fl_platte_s",
+   "cls": "street",
+   "fromLeg": "S",
+   "labelDx": -30
+  },
+  {
+   "id": "fl_zuni_raritan_eb",
+   "from": "tmc_fl_zuni",
+   "to": "tmc_fl_raritan",
+   "cls": "street",
+   "label": "Florida EB, Zuni to Raritan",
+   "fromLeg": "E",
+   "toLeg": "W",
+   "labelDy": 14
+  },
+  {
+   "id": "fl_raritan_zuni_wb",
+   "from": "tmc_fl_raritan",
+   "to": "tmc_fl_zuni",
+   "cls": "street",
+   "label": "Florida WB, Raritan to Zuni",
+   "fromLeg": "W",
+   "toLeg": "E",
+   "labelDy": -26,
+   "chipsUp": true
+  },
+  {
+   "id": "fl_raritan_osage_eb",
+   "from": "tmc_fl_raritan",
+   "to": "tmc_fl_osage",
+   "cls": "street",
+   "label": "Florida EB, Raritan to Osage",
+   "fromLeg": "E",
+   "toLeg": "W",
+   "labelDy": 14
+  },
+  {
+   "id": "fl_osage_raritan_wb",
+   "from": "tmc_fl_osage",
+   "to": "tmc_fl_raritan",
+   "cls": "street",
+   "label": "Florida WB, Osage to Raritan",
+   "fromLeg": "W",
+   "toLeg": "E",
+   "labelDy": -26,
+   "chipsUp": true
+  },
+  {
+   "id": "fl_osage_lipan_eb",
+   "from": "tmc_fl_osage",
+   "to": "tmc_fl_lipan",
+   "cls": "street",
+   "label": "Florida EB, Osage to Lipan",
+   "fromLeg": "E",
+   "toLeg": "W",
+   "labelDy": 14
+  },
+  {
+   "id": "fl_lipan_osage_wb",
+   "from": "tmc_fl_lipan",
+   "to": "tmc_fl_osage",
+   "cls": "street",
+   "label": "Florida WB, Lipan to Osage",
+   "fromLeg": "W",
+   "toLeg": "E",
+   "labelDy": -26,
+   "chipsUp": true
+  },
+  {
+   "id": "fl_lipan_platte_eb",
+   "from": "tmc_fl_lipan",
+   "to": "tmc_fl_platte",
+   "cls": "street",
+   "label": "Florida EB, Lipan to S Platte River Dr",
+   "fromLeg": "E",
+   "toLeg": "W",
+   "labelDy": 14
+  },
+  {
+   "id": "fl_platte_lipan_wb",
+   "from": "tmc_fl_platte",
+   "to": "tmc_fl_lipan",
+   "cls": "street",
+   "label": "Florida WB, S Platte River Dr to Lipan",
+   "fromLeg": "W",
+   "toLeg": "E",
+   "labelDy": -26,
+   "chipsUp": true
+  },
+  {
+   "id": "fl_platte_florida_eb",
+   "from": "tmc_fl_platte",
+   "to": "tmc_florida",
+   "cls": "street",
+   "label": "Florida EB, S Platte River Dr to Santa Fe",
+   "fromLeg": "E",
+   "toLeg": "W",
+   "labelDy": 14
+  },
+  {
+   "id": "fl_florida_platte_wb",
+   "from": "tmc_florida",
+   "to": "tmc_fl_platte",
+   "cls": "street",
+   "label": "Florida WB, Santa Fe to S Platte River Dr",
+   "fromLeg": "W",
+   "toLeg": "E",
+   "labelDy": -26,
+   "chipsUp": true
+  },
+  {
+   "id": "fl_west_in",
+   "from": "t_fl_west",
+   "to": "tmc_fl_zuni",
+   "cls": "street",
+   "label": "Florida EB from west",
+   "toLeg": "W",
+   "labelDy": 14
+  },
+  {
+   "id": "fl_west_out",
+   "from": "tmc_fl_zuni",
+   "to": "t_fl_west",
+   "cls": "street",
+   "label": "Florida WB to west",
+   "fromLeg": "W",
+   "labelDy": -14
+  },
+  {
+   "id": "ns_zuni_lf_sb",
+   "from": "tmc_lou_zuni",
+   "to": "tmc_fl_zuni",
+   "cls": "street",
+   "label": "S Zuni St SB, Louisiana to Florida",
+   "fromLeg": "S",
+   "toLeg": "N",
+   "labelDx": -34
+  },
+  {
+   "id": "ns_zuni_lf_nb",
+   "from": "tmc_fl_zuni",
+   "to": "tmc_lou_zuni",
+   "cls": "street",
+   "label": "S Zuni St NB, Florida to Louisiana",
+   "fromLeg": "N",
+   "toLeg": "S",
+   "labelDx": 34
+  },
+  {
+   "id": "platte_w_sb",
+   "from": "tmc_sfsb_split",
+   "to": "tmc_fl_platte",
+   "cls": "street",
+   "label": "S Platte River Dr W SB, split to Florida",
+   "fromLeg": "W",
+   "toLeg": "N",
+   "labelT": 0.6,
+   "labelDx": -40
+  },
+  {
+   "id": "platte_w_nb",
+   "from": "tmc_fl_platte",
+   "to": "t_platte_w_nb",
+   "cls": "street",
+   "label": "S Platte River Dr W NB from Florida",
+   "fromLeg": "N",
    "labelDx": 34
   }
  ],
@@ -13110,11 +13591,11 @@
    }
   },
   "sprt_2026": {
-   "name": "SPRT field TMC, April 2026 (AtkinsRéalis report Fig. 36)",
+   "name": "SPRT field TMC, April 2026 (AtkinsRéalis report Figs. 36-37)",
    "kind": "field_tmc",
    "period": "Wed Apr 22, 2026 (PM peak hour 16:00-17:00)",
    "imported": "2026-11-12",
-   "note": "South Platte River Trail Traffic Data Collection Report, draft Aug 2026, Figure 36 (report p.44 / PDF p.51). Hourly PM peak values stored under the single key '1600'; bind with bins = 1. Site 4S: the figure prints EB through 26 / EB right 448; stored as through 448 / right 26 (the figure values are evidently swapped: site 4N and site 24 both carry ~450-565 EB through).",
+   "note": "South Platte River Trail Traffic Data Collection Report, draft Aug 2026, Figures 36-37 (report pp.44-45 / PDF pp.51-52). Hourly PM peak values stored under the single key '1600'; bind with bins = 1. Site 4S: the figure prints EB through 26 / EB right 448; stored as through 448 / right 26 (the figure values are evidently swapped: site 4N and site 24 both carry ~450-565 EB through).",
    "data": {
     "Site 3 - W Mississippi Ave @ S Zuni St": {
      "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
@@ -13308,6 +13789,222 @@
        0,
        0,
        0,
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    "Site 6 - W Florida Ave @ S Zuni St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       51,
+       189,
+       45,
+       16,
+       153,
+       35,
+       28,
+       297,
+       48,
+       83,
+       474,
+       13
+      ]
+     }
+    },
+    "Site 21 - W Florida Ave @ S Raritan St (south leg)": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       31,
+       0,
+       24,
+       0,
+       0,
+       0,
+       0,
+       320,
+       17,
+       37,
+       543,
+       0
+      ]
+     }
+    },
+    "Site 33 - W Florida Ave @ S Osage St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       6,
+       0,
+       8,
+       6,
+       1,
+       7,
+       3,
+       346,
+       4,
+       9,
+       597,
+       6
+      ]
+     }
+    },
+    "Site 27 - W Florida Ave @ S Lipan St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       4,
+       6,
+       2,
+       69,
+       4,
+       70,
+       32,
+       323,
+       3,
+       4,
+       543,
+       85
+      ]
+     }
+    },
+    "Site 18 - W Florida Ave @ S Platte River Dr": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       144,
+       134,
+       90,
+       58,
+       336,
+       264,
+       10,
+       275,
+       86,
+       15,
+       218,
+       16
+      ]
+     }
+    },
+    "Site 17 - W Florida Ave @ S Santa Fe Dr": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       187,
+       2342,
+       16,
+       7,
+       2496,
+       23,
+       222,
+       6,
+       215,
+       72,
+       48,
+       8
+      ]
+     }
+    },
+    "Site 25 - W Iowa Ave bike/ped crossing @ S Santa Fe Dr": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       0,
+       2646,
+       0,
+       0,
+       2802,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0,
+       0
+      ]
+     }
+    },
+    "Site 16 - W Jewell Ave @ S Zuni St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       46,
+       210,
+       10,
+       15,
+       160,
+       39,
+       47,
+       114,
+       38,
+       10,
+       182,
+       19
+      ]
+     }
+    },
+    "Site 20 - W Jewell Ave @ S Tejon St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       34,
+       47,
+       22,
+       2,
+       12,
+       4,
+       6,
+       109,
+       20,
+       21,
+       179,
+       10
+      ]
+     }
+    },
+    "Site 30 - W Jewell Ave @ S Raritan St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       5,
+       8,
+       5,
+       8,
+       3,
+       16,
+       13,
+       72,
+       12,
+       8,
+       139,
+       17
+      ]
+     }
+    },
+    "Site 19 - W Jewell Ave @ S Platte River Dr W / S Lipan St": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       9,
+       96,
+       4,
+       3,
+       335,
+       103,
+       67,
+       1,
+       81,
+       111,
+       8,
+       215
+      ]
+     }
+    },
+    "Site 31 - W Jewell Ave @ S Santa Fe Dr": {
+     "PM peak 16:00-17:00 (field count, Wed 2026-04-22)": {
+      "1600": [
+       0,
+       2642,
+       0,
+       0,
+       2726,
+       34,
+       0,
+       0,
+       40,
        0,
        0,
        0
